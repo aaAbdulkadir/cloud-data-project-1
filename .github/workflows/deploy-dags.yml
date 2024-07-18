@@ -37,28 +37,26 @@ jobs:
         chmod 600 private_key.pem
 
         ssh -o StrictHostKeyChecking=no -i private_key.pem ${EC2_USER}@${EC2_INSTANCE} << EOF
-        
-        # Sync DAGs from S3 to Airflow dags folder
-        aws s3 sync s3://${S3_BUCKET}/dags/ /home/${EC2_USER}/airflow/dags/
+          # Sync DAGs from S3 to Airflow dags folder
+          aws s3 sync s3://${S3_BUCKET}/dags/ /home/${EC2_USER}/airflow/dags/
 
-        # Check if requirements.txt has changed
-        if [ -f "/home/${EC2_USER}/airflow/requirements.txt" ]; then
-          if ! cmp -s "requirements.txt" "/home/${EC2_USER}/airflow/requirements.txt"; then
-            cp requirements.txt /home/${EC2_USER}/airflow/requirements.txt
+          # Fetch the latest requirements.txt from S3 to a temporary location
+          aws s3 cp s3://${S3_BUCKET}/requirements.txt /tmp/requirements.txt
+
+          # Check if requirements.txt has changed
+          if ! cmp -s /tmp/requirements.txt /home/${EC2_USER}/airflow/requirements.txt; then
+            echo "Requirements file has changed. Updating..."
+            cp /tmp/requirements.txt /home/${EC2_USER}/airflow/requirements.txt
             source /home/${EC2_USER}/venv/bin/activate
             pip install -r /home/${EC2_USER}/airflow/requirements.txt
             deactivate
+          else
+            echo "Requirements file has not changed. No update needed."
           fi
-        else
-          cp requirements.txt /home/${EC2_USER}/airflow/requirements.txt
-          source /home/${EC2_USER}/venv/bin/activate
-          pip install -r /home/${EC2_USER}/airflow/requirements.txt
-          deactivate
-        fi
 
-        # Restart Airflow Scheduler and Webserver
-        sudo systemctl restart airflow-scheduler
-        sudo systemctl restart airflow-webserver
+          # Restart Airflow Scheduler and Webserver
+          sudo systemctl restart airflow-scheduler
+          sudo systemctl restart airflow-webserver
         EOF
 
     - name: Clean up
