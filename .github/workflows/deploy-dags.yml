@@ -1,0 +1,64 @@
+name: Deploy DAGs to Airflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1-node16
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Sync DAGs to S3
+      run: aws s3 sync ./dags/ s3://${{ secrets.S3_BUCKET }}/dags/
+
+    - name: Upload requirements.txt to S3
+      run: aws s3 cp ./requirements.txt s3://${{ secrets.S3_BUCKET }}/requirements.txt
+
+    - name: Sync DAGs and Update Requirements on EC2
+      env:
+        S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        EC2_USER: ${{ secrets.EC2_USER }}
+        EC2_INSTANCE: ${{ secrets.EC2_INSTANCE }}
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      run: |
+        echo "${SSH_PRIVATE_KEY}" > private_key.pem
+        chmod 600 private_key.pem
+
+        ssh -o StrictHostKeyChecking=no -i private_key.pem ${EC2_USER}@${EC2_INSTANCE} << EOF
+          # Sync DAGs from S3 to Airflow dags folder
+          aws s3 sync s3://${S3_BUCKET}/dags/ /home/${EC2_USER}/airflow/dags/
+
+          # Check if requirements.txt has changed
+          if [ -f "/home/${EC2_USER}/airflow/requirements.txt" ]; then
+            if ! cmp -s "requirements.txt" "/home/${EC2_USER}/airflow/requirements.txt"; then
+              cp requirements.txt /home/${EC2_USER}/airflow/requirements.txt
+              source /home/${EC2_USER}/venv/bin/activate
+              pip install -r /home/${EC2_USER}/airflow/requirements.txt
+              deactivate
+            fi
+          else
+            cp requirements.txt /home/${EC2_USER}/airflow/requirements.txt
+            source /home/${EC2_USER}/venv/bin/activate
+            pip install -r /home/${EC2_USER}/airflow/requirements.txt
+            deactivate
+          fi
+
+          # Restart Airflow Scheduler and Webserver
+          sudo systemctl restart airflow-scheduler
+          sudo systemctl restart airflow-webserver
+        EOF
+
+    - name: Clean up
+      run: rm private_key.pem
