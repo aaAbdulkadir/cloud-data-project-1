@@ -37,14 +37,6 @@ jobs:
         chmod 600 private_key.pem
 
         ssh -o StrictHostKeyChecking=no -i private_key.pem ${EC2_USER}@${EC2_INSTANCE} << EOF
-        # Debug: Check AWS CLI configuration
-        aws configure list
-
-        # Debug: List files in the current directory
-        ls -la
-        
-        # Debug: Check if requirements.txt exists
-        ls -la /home/${EC2_USER}/airflow/requirements.txt
         
         # Sync DAGs from S3 to Airflow dags folder
         aws s3 sync s3://${S3_BUCKET}/dags/ /home/${EC2_USER}/airflow/dags/

@@ -429,6 +429,13 @@ sudo systemctl status airflow-scheduler
 
 Run the commands found in the `Downloading AWS CLI` section
 
+Once downloaded, configure aws with your access key and secret key on the ec2 by typing 
+
+```
+aws configure
+```
+
+
 ## Set up IAM Credentials on EC2
 
 
