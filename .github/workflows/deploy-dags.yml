@@ -37,27 +37,36 @@ jobs:
         chmod 600 private_key.pem
 
         ssh -o StrictHostKeyChecking=no -i private_key.pem ${EC2_USER}@${EC2_INSTANCE} << EOF
-          # Sync DAGs from S3 to Airflow dags folder
-          aws s3 sync s3://${S3_BUCKET}/dags/ /home/${EC2_USER}/airflow/dags/
+        # Debug: Check AWS CLI configuration
+        aws configure list
 
-          # Check if requirements.txt has changed
-          if [ -f "/home/${EC2_USER}/airflow/requirements.txt" ]; then
-            if ! cmp -s "requirements.txt" "/home/${EC2_USER}/airflow/requirements.txt"; then
-              cp requirements.txt /home/${EC2_USER}/airflow/requirements.txt
-              source /home/${EC2_USER}/venv/bin/activate
-              pip install -r /home/${EC2_USER}/airflow/requirements.txt
-              deactivate
-            fi
-          else
+        # Debug: List files in the current directory
+        ls -la
+        
+        # Debug: Check if requirements.txt exists
+        ls -la /home/${EC2_USER}/airflow/requirements.txt
+        
+        # Sync DAGs from S3 to Airflow dags folder
+        aws s3 sync s3://${S3_BUCKET}/dags/ /home/${EC2_USER}/airflow/dags/
+
+        # Check if requirements.txt has changed
+        if [ -f "/home/${EC2_USER}/airflow/requirements.txt" ]; then
+          if ! cmp -s "requirements.txt" "/home/${EC2_USER}/airflow/requirements.txt"; then
             cp requirements.txt /home/${EC2_USER}/airflow/requirements.txt
             source /home/${EC2_USER}/venv/bin/activate
             pip install -r /home/${EC2_USER}/airflow/requirements.txt
             deactivate
           fi
+        else
+          cp requirements.txt /home/${EC2_USER}/airflow/requirements.txt
+          source /home/${EC2_USER}/venv/bin/activate
+          pip install -r /home/${EC2_USER}/airflow/requirements.txt
+          deactivate
+        fi
 
-          # Restart Airflow Scheduler and Webserver
-          sudo systemctl restart airflow-scheduler
-          sudo systemctl restart airflow-webserver
+        # Restart Airflow Scheduler and Webserver
+        sudo systemctl restart airflow-scheduler
+        sudo systemctl restart airflow-webserver
         EOF
 
     - name: Clean up
