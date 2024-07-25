@@ -429,12 +429,6 @@ sudo systemctl status airflow-scheduler
 
 Run the commands found in the `Downloading AWS CLI` section
 
-Once downloaded, configure aws with your access key and secret key on the ec2 by typing 
-
-```
-aws configure
-```
-
 
 ## Set up IAM Credentials on EC2
 
@@ -453,6 +447,12 @@ In the bashrc file of the EC2 instance, export the access key variables and sour
 ```
 export AWS_ACCESS_KEY_ID='your_access_key'
 export AWS_SECRET_ACCESS_KEY='your_secret_key'
+```
+
+Once downloaded, configure aws with your access key and secret key on the ec2 by typing 
+
+```
+aws configure
 ```
 
 After, ensure the following airflow aws package is installed to interact with AWS services
@@ -493,6 +493,11 @@ GitHub actions pipeline needs to:
 After adding the keys, create a GitHub actions workflow
 
 - Create a new workflow file in the repository at `.github/workflows/deploy-dags.yml`
+
+In this example, the pipeline created can be found under `.github/workflows/deploy-dags.yml`. As soon as the yaml file is written and the code is pushed, it will be initiated.
+
+At this point in the project, if code is pushed to the repo, the changes will be reflected on airflow, where the dags will update on the local airflow server and the packages will also be updated if there is a change. The infrastructure has been done and what is left is the set up of the dags.
+
 
 
 
