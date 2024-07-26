@@ -1,6 +1,6 @@
 import os 
 
-from dags.dag_generator import create_dag
+from dag_generator import create_dag
 
 
 dags_folder = os.path.dirname(os.path.abspath(__name__))

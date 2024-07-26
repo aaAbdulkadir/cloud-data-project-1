@@ -1,7 +1,7 @@
-import unittest
 import os
 import sys
 from pathlib import Path
+import pendulum
 
 # Add the project root to the Python path
 project_root = Path(__file__).parents[1]
@@ -31,6 +31,7 @@ class TestDAGGenerator(TestBase):
         self.dummy_dag_functions_path = os.path.join(
             self.dummy_dag_dir, 'dummy_dag_functions.py'
         )
+        self.logical_timestamp = pendulum.now()
 
     def test_load_yaml_is_valid(self):
         self.validate_config(self.dummy_dag_yml)
@@ -45,9 +46,15 @@ class TestDAGGenerator(TestBase):
         assert json_data['foo'] == 'bar'
 
     def test_import_functions(self):
+        config = {'foo': 'bar'  }
         module = import_functions(self.dummy_dag_functions_path)
         self.assertIsNotNone(module)
-        assert module.extract('http://example.com', 'output.csv') == 1
+        assert module.extract(
+            'http://example.com',
+            'output.csv',
+            self.logical_timestamp,
+            config
+        ) == 1
         assert module.transform('input.csv', 'output.csv') == 1
 
     def test_create_dag(self):
