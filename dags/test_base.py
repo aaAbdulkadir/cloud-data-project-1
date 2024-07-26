@@ -1,5 +1,5 @@
 import unittest
-from dag_generator import load_yml_file
+from dags.dag_generator import load_yml_file
 
 class TestBase(unittest.TestCase):
 

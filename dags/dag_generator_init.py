@@ -1,9 +1,9 @@
 import os 
 
-from custom_functions.dag_generator import create_dag
+from dags.dag_generator import create_dag
 
 
-dags_folder = os.path.dirname(os.path.abspath(__file__))
+dags_folder = os.path.dirname(os.path.abspath(__name__))
 
 for folder in os.listdir(dags_folder):
     folder_path = os.path.join(dags_folder, folder)

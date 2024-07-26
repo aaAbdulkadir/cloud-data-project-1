@@ -7,13 +7,13 @@ from pathlib import Path
 project_root = Path(__file__).parents[1]
 sys.path.append(str(project_root))
 
-from custom_functions.dag_generator import (
+from dags.dag_generator import (
     load_yml_file,
     load_json_file,
     import_functions,
     create_dag,
 )
-from custom_functions.test_base import TestBase
+from dags.test_base import TestBase
 
 class TestDAGGenerator(TestBase):
     def setUp(self):
