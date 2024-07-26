@@ -46,7 +46,7 @@ class TestDAGGenerator(TestBase):
         assert json_data['foo'] == 'bar'
 
     def test_import_functions(self):
-        config = {'foo': 'bar'  }
+        config = {'foo': 'bar'}
         module = import_functions(self.dummy_dag_functions_path)
         self.assertIsNotNone(module)
         assert module.extract(
