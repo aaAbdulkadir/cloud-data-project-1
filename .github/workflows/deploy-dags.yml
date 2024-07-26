@@ -21,7 +21,7 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Sync DAGs to S3
-      run: aws s3 sync ./dags/ s3://${{ secrets.S3_BUCKET }}/dags/
+      run: aws s3 sync ./dags/ s3://${{ secrets.S3_BUCKET }}/dags/ --delete
 
     - name: Upload requirements.txt to S3
       run: aws s3 cp ./requirements.txt s3://${{ secrets.S3_BUCKET }}/requirements.txt
@@ -37,8 +37,8 @@ jobs:
         chmod 600 private_key.pem
 
         ssh -o StrictHostKeyChecking=no -i private_key.pem ${EC2_USER}@${EC2_INSTANCE} << EOF
-          # Sync DAGs from S3 to Airflow dags folder
-          aws s3 sync s3://${S3_BUCKET}/dags/ /home/${EC2_USER}/airflow/dags/
+          # Sync DAGs from S3 to Airflow dags folder with delete flag to remove deleted DAGs
+          aws s3 sync s3://${S3_BUCKET}/dags/ /home/${EC2_USER}/airflow/dags/ --delete
 
           # Fetch the latest requirements.txt from S3 to a temporary location
           aws s3 cp s3://${S3_BUCKET}/requirements.txt /tmp/requirements.txt
