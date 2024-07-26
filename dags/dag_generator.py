@@ -63,55 +63,51 @@ def create_dag(scrape_dir_path: str) -> DAG:
     )
 
     with dag:
-        # Define the extract task
-        extract_task = PythonOperator(
-            task_id='extract',
-            python_callable=functions.extract_function,
-            retries=dag_params['tasks']['extract'].get('retries', 0),
-            retry_delay=timedelta(seconds=dag_params['tasks']['extract'].get('retry_delay', 15)),
-            op_kwargs={
-                'url': dag_params.get('url'),
-                'output_filename': f'{dag_id}_extract_to_transform_{{{{ ts }}}}.{file_extension}',
-                'logical_timestamp': '{{ ts }}',
-                **config,
-                **dag_params['tasks']['extract'].get('kwargs', {})
-            },
-            dag=dag
-        )
+        tasks = {}
 
-        # Define the transform task
-        transform_task = PythonOperator(
-            task_id='transform',
-            python_callable=functions.transform_function,
-            retries=dag_params['tasks']['transform'].get('retries', 0),
-            retry_delay=timedelta(seconds=dag_params['tasks']['transform'].get('retry_delay', 15)),
-            op_kwargs={
-                'input_filename': f'{dag_id}_extract_to_transform_{{{{ ts }}}}.{file_extension}',
-                'output_filename': f'{dag_id}_transform_to_load_{{{{ ts }}}}.csv',
-                **config,
-                **dag_params['tasks']['transform'].get('kwargs', {})
-            },
-            dag=dag
-        )
+        for task_id, task_params in dag_params.get('tasks', {}).items():
+            if task_id == 'load':
+                python_callable = getattr(load_to_db, 'load')
+            else:
+                python_callable = getattr(functions, task_params.get('python_callable'))
 
-        # Define the load task
-        load_task = PythonOperator(
-            task_id='load',
-            python_callable=load_to_db.load_function,
-            retries=dag_params['tasks']['load'].get('retries', 0),
-            retry_delay=timedelta(seconds=dag_params['tasks']['load'].get('retry_delay', 15)),
-            op_kwargs={
-                'input_filename': f'{dag_id}_transform_to_load_{{{{ ts }}}}.csv',
-                'mode': dag_params['tasks']['load'].get('mode'),
-                'dataset_name': dag_params['tasks']['load'].get('dataset_name'),
-                'fields': dag_params['tasks']['load'].get('fields'),
-                **config,
-                **dag_params['tasks']['load'].get('kwargs', {})
-            },
-            dag=dag
-        )
+            task_kwargs = {
+                **config,  
+                **task_params.get('kwargs', {}),  
+            }
+            
+            if task_id == 'extract':
+                task_kwargs.update({
+                    'url': dag_params.get('url'),
+                    'output_filename': f'{dag_id}_extract_to_transform_{{{{ ts }}}}.{file_extension}',
+                    'logical_timestamp': '{{ ts }}',
+                })
+            elif task_id == 'transform':
+                task_kwargs.update({
+                    'input_filename': f'{dag_id}_extract_to_transform_{{{{ ts }}}}.{file_extension}',
+                    'output_filename': f'{dag_id}_transform_to_load_{{{{ ts }}}}.csv',
+                })
+            elif task_id == 'load':
+                task_kwargs.update({
+                    'input_filename': f'{dag_id}_transform_to_load_{{{{ ts }}}}.csv',
+                    'mode': task_params.get('mode'),
+                    'dataset_name': task_params.get('dataset_name'),
+                    'fields': task_params.get('fields'),
+                })
 
-        # Set task dependencies
-        extract_task >> transform_task >> load_task
+            task = PythonOperator(
+                task_id=task_id,
+                python_callable=python_callable,
+                retries=task_params.get('retries', 0),
+                retry_delay=timedelta(seconds=task_params.get('retry_delay', 15)),
+                op_kwargs=task_kwargs,
+                dag=dag
+            )
+            tasks[task_id] = task
+
+        for task_id, task_params in dag_params.get('tasks', {}).items():
+            dependencies = task_params.get('dependencies', [])
+            for dependency in dependencies:
+                tasks[dependency] >> tasks[task_id]
 
     return dag
