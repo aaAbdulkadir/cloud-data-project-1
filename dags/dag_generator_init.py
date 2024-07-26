@@ -12,4 +12,5 @@ for folder in os.listdir(dags_folder):
         yaml_file_path = os.path.join(folder_path, f'{folder}.yml')
 
         if os.path.isfile(yaml_file_path):
-            create_dag(folder_path)
+            dag = create_dag(folder_path)
+            globals()[dag.dag_id] = dag
