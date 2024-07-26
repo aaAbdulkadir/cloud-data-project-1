@@ -110,4 +110,9 @@ def create_dag(scrape_dir_path: str) -> DAG:
             for dependency in dependencies:
                 tasks[dependency] >> tasks[task_id]
 
+    print(dag_id)
+    print(yml_file_path)
+    print(f'{dag_id}_extract_to_transform_{{{{ ts }}}}.{file_extension}')
+    
+
     return dag

@@ -3,6 +3,7 @@ import yaml
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
+import pendulum
 
 def load_yml_file(yml_file_path: str) -> dict:
     """Load DAG configuration from a YAML file."""
@@ -46,7 +47,7 @@ def create_dag(dag_id: str, dag_params: dict) -> DAG:
         dag_id,
         default_args=default_args,
         schedule_interval=dag_params.get('schedule_interval'),
-        start_date=datetime.strptime(dag_params.get('start_date'), '%Y-%m-%d'),
+        start_date=pendulum.now('UTC'),
         catchup=dag_params.get('catchup', False),
     )
 
