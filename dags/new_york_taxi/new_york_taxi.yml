@@ -3,11 +3,15 @@ new_york_taxi:
   description: Getting new york taxi data
   schedule_interval: '0 9 * * *'
   url: https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
-
+  
   email_on_failure: True
+  email_on_retry: False
+  email_on_success: False
   email: a.abdulkadir@hotmail.com
-
-  python_callable_file: new_york_taxi/new_york_taxi_functions.py
+  
+  python_callable_file: new_york_taxi_functions.py  
+  config_path: config/config.json
+  
   tasks:
     extract:
       python_callable: extract
@@ -21,19 +25,19 @@ new_york_taxi:
     transform:
       python_callable: transform
       dependencies:
-      - extract
-
+        - extract
+        
     load:
       mode: append
       dataset_name: new_york_taxi
       dependencies:
-      - transform
+        - transform
       fields:
-      - name: Date
-        type: Date
-      - name: Time
-        type: Varchar(100)
-      - name: Service 
-        type: Varchar(100)
-      - name: Time
-        type: Varchar(100)
+        - name: Date
+          type: Date
+        - name: Time
+          type: Varchar(100)
+        - name: Service 
+          type: Varchar(100)
+        - name: Time
+          type: Varchar(100)

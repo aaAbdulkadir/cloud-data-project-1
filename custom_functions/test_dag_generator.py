@@ -7,15 +7,15 @@ from pathlib import Path
 project_root = Path(__file__).parents[1]
 sys.path.append(str(project_root))
 
-from dags.dag_generator import (
-    load_dag_config,
+from custom_functions.dag_generator import (
+    load_yml_file,
     load_json_file,
     import_functions,
     create_dag,
 )
+from custom_functions.test_base import TestBase
 
-
-class TestDAGGenerator(unittest.TestCase):
+class TestDAGGenerator(TestBase):
     def setUp(self):
         self.base_dir = project_root
         self.dags_dir = os.path.join(self.base_dir, 'dags')
@@ -23,15 +23,21 @@ class TestDAGGenerator(unittest.TestCase):
             self.dags_dir, 'dummy_dag'
         )
         self.dummy_dag_yml = os.path.join(
-            self.dags_dir, self.dummy_dag_dir, 'dummy_dag.yml'
+            self.dummy_dag_dir, 'dummy_dag.yml'
         )
         self.json_file_path = os.path.join(
-            self.dags_dir, 'dummy_dag', 'config', 'config.json'
+             self.dummy_dag_dir, 'config', 'config.json'
         )
+        self.dummy_dag_functions_path = os.path.join(
+            self.dummy_dag_dir, 'dummy_dag_functions.py'
+        )
+
+    def test_load_yaml_is_valid(self):
+        self.validate_config(self.dummy_dag_yml)
 
     def test_load_dag_config(self):
         yml_file_path = self.dummy_dag_yml
-        yml = load_dag_config(yml_file_path)
+        yml = load_yml_file(yml_file_path)
         self.assertIsNotNone(yml)
 
     def test_load_json_file(self):
@@ -39,7 +45,7 @@ class TestDAGGenerator(unittest.TestCase):
         assert json_data['foo'] == 'bar'
 
     def test_import_functions(self):
-        module = import_functions(self.dummy_dag_dir)
+        module = import_functions(self.dummy_dag_functions_path)
         self.assertIsNotNone(module)
         assert module.extract('http://example.com', 'output.csv') == 1
         assert module.transform('input.csv', 'output.csv') == 1

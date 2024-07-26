@@ -1,18 +1,20 @@
 dummy_dag:
   owner: Abdulkadir
-  description: Dummy dag
+  description: dummy dag
   schedule_interval: '0 9 * * *'
-  url: www.google.com
+  url: https://www.google.com
 
-  email: a.abdulkadir@hotmail.com
   email_on_failure: True
   email_on_retry: False
   email_on_success: False
-
-  json_config_path: True
-
+  email: a.abdulkadir@hotmail.com
+  
+  python_callable_file: dummy_dag_functions.py  
+  config_path: config/config.json
+  
   tasks:
     extract:
+      python_callable: extract
       file_extension: csv
       retries: 3
       retry_delay: 1200
@@ -21,24 +23,21 @@ dummy_dag:
         test: 'Yes'
 
     transform:
-      retries: 3
-      retry_delay: 1200
-      kwargs:
-        test: 'Yes'
+      python_callable: transform
       dependencies:
-      - extract
-
+        - extract
+        
     load:
       mode: append
       dataset_name: dummy_dag
       dependencies:
-      - transform
+        - transform
       fields:
-      - name: Date
-        type: Date
-      - name: Time
-        type: Varchar(100)
-      - name: Service 
-        type: Varchar(100)
-      - name: Time
-        type: Varchar(100)
+        - name: Date
+          type: Date
+        - name: Time
+          type: Varchar(100)
+        - name: Service 
+          type: Varchar(100)
+        - name: Time
+          type: Varchar(100)
