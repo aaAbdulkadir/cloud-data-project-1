@@ -1,8 +1,6 @@
 def extract(
     url: str,
     output_filename: str,
-    logical_timestamp: "pendulum.datetime",
-    config: dict
 ) -> None:
     """_summary_
 
@@ -10,14 +8,7 @@ def extract(
         url (str): _description_
         output_filename (str): _description_
     """
-    import logging
-
-    logger = logging.getLogger('extract')
-
-    logger.info(url)
-    logger.info(output_filename)
-    logger.info(logical_timestamp)
-    logger.info(config)
+    return 1
 
 def transform(input_filename: str, output_filename: str) -> None:
     """_summary_
@@ -26,9 +17,4 @@ def transform(input_filename: str, output_filename: str) -> None:
         input_filename (str): _description_
         output_filename (str): _description_
     """
-    import logging
-
-    logger = logging.getLogger('transform')
-
-    logger.info(input_filename)
-    logger.info(output_filename)
+    return 1
