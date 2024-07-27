@@ -37,8 +37,8 @@ def import_functions(functions_filepath: str):
 def create_dag(scrape_dir_path: str) -> DAG:
     """Create a DAG from the configuration and functions in the specified directory."""
 
-    dag_id = os.path.basename(scrape_dir_path)
     yml_file_path = os.path.join(scrape_dir_path, f'{dag_id}.yml')
+    dag_id = os.path.basename(yml_file_path).split('.')[0]
     dag_params = load_yml_file(yml_file_path)[dag_id]
     load_dag_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'load_to_db.py')
 
