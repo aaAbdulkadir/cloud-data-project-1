@@ -12,7 +12,6 @@ def extract(
         output_filename (str): _description_
     """
     import logging
-    import requests
 
     logger = logging.getLogger('extract')
 
@@ -22,9 +21,8 @@ def extract(
     logger.info(config)
     logger.info(historical)
 
-    response = requests.get(url)
     with open(output_filename, 'wb') as f:
-        f.write(response.content)
+        f.write('Testing')
 
     return 1
 
