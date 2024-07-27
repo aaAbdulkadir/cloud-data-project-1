@@ -33,6 +33,13 @@ class TestDAGGenerator(TestBase):
         )
         self.logical_timestamp = pendulum.now()
 
+        self.dummy_dag_extract_filename = os.path.join(
+            self.dummy_dag_dir, 'extract.csv'
+        )
+        self.dummy_dag_transform_filename = os.path.join(
+            self.dummy_dag_dir, 'transform.csv'
+        )
+
     def test_load_yaml_is_valid(self):
         self.validate_config(self.dummy_dag_yml)
 
@@ -51,11 +58,16 @@ class TestDAGGenerator(TestBase):
         self.assertIsNotNone(module)
         assert module.extract(
             'http://example.com',
-            'output.csv',
+            self.dummy_dag_extract_filename,
             self.logical_timestamp,
-            config
+            config,
+            True
         ) == 1
-        assert module.transform('input.csv', 'output.csv') == 1
+        assert module.transform(
+            self.dummy_dag_extract_filename, self.dummy_dag_transform_filename
+        ) == 1
+
+        os.remove(self.dummy_dag_extract_filename)
 
     def test_create_dag(self):
 

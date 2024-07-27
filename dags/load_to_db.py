@@ -1,4 +1,4 @@
-def load(input_filename: str) -> None:
+def load(input_filename: str, mode: str, dataset_name: str, fields: dict) -> None:
     """_summary_
 
     Args:

@@ -5,11 +5,11 @@ def extract(
     config: dict,
     historical: bool,
 ) -> int:
-    """_summary_
+    """Dummy extract for testing purposes.
 
     Args:
-        url (str): _description_
-        output_filename (str): _description_
+        url (str): url from yml
+        output_filename (str): output filename
     """
     import logging
 
@@ -22,18 +22,19 @@ def extract(
     logger.info(historical)
 
     with open(output_filename, 'w') as f:
-        f.write('Testing')
+        f.write('Testing,1,animal')
 
     return 1
 
 def transform(input_filename: str, output_filename: str) -> int:
-    """_summary_
+    """Dummy transform for testing purposes.
 
     Args:
-        input_filename (str): _description_
-        output_filename (str): _description_
+        input_filename (str): input filename for extract output
+        output_filename (str): file to load to
     """
     import logging
+    import pandas as pd
 
     logger = logging.getLogger('transform')
 
@@ -44,5 +45,7 @@ def transform(input_filename: str, output_filename: str) -> int:
         data = f.read()
 
     logger.info(data)
+
+    pd.DataFrame(data).to_csv(output_filename, index=False)
 
     return 1
