@@ -7,6 +7,16 @@ import importlib
 import json
 from datetime import timedelta
 
+AIRFLOW_HOME = '/home/ubuntu/airflow'
+STAGING_DATA = AIRFLOW_HOME + '/staging_data/'
+
+EXTRACT_TO_TRANSFROM = (
+    STAGING_DATA + '{{ dag.dag_id }}_extract_to_transform_{{ ts }}.{{ dag.default_args.file_extension }}'
+)
+TRANSFORM_TO_LOAD = (
+    STAGING_DATA + '{{ dag.dag_id }}_transform_to_load_{{ ts }}.csv'
+)
+
 def load_yml_file(yml_file_path: str) -> dict:
     """Load DAG configuration from a YAML file."""
     with open(yml_file_path, 'r') as config_file:
@@ -77,18 +87,18 @@ def create_dag(scrape_dir_path: str) -> DAG:
             if task_id == 'extract':
                 task_kwargs.update({
                     'url': dag_params.get('url'),
-                    'output_filename': '{{ dag.dag_id }}_extract_to_transform_{{ ts }}.{{ dag.default_args.file_extension }}',
+                    'output_filename': EXTRACT_TO_TRANSFROM,
                     'logical_timestamp': '{{ ts }}',
                     'config': config,
                 })
             elif task_id == 'transform':
                 task_kwargs.update({
-                    'input_filename': '{{ dag.dag_id }}_extract_to_transform_{{ ts }}.{{ dag.default_args.file_extension }}',
-                    'output_filename': '{{ dag.dag_id }}_transform_to_load_{{ ts }}.csv',
+                    'input_filename': EXTRACT_TO_TRANSFROM,
+                    'output_filename': TRANSFORM_TO_LOAD,
                 })
             elif task_id == 'load':
                 task_kwargs.update({
-                    'input_filename': '{{ dag.dag_id }}_transform_to_load_{{ ts }}.csv',
+                    'input_filename': TRANSFORM_TO_LOAD,
                     'mode': task_params.get('mode'),
                     'dataset_name': task_params.get('dataset_name'),
                     'fields': task_params.get('fields'),
