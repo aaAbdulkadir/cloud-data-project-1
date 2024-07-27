@@ -1,4 +1,5 @@
 pandas
 psycopg2-binary
 apache-airflow
-nltk
+pytest
+boto3
