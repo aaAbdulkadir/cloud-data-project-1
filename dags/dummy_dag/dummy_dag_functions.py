@@ -2,7 +2,8 @@ def extract(
     url: str,
     output_filename: str,
     logical_timestamp: "pendulum.datetime",
-    config: dict
+    config: dict,
+    historical: bool,
 ) -> int:
     """_summary_
 
@@ -19,6 +20,7 @@ def extract(
     logger.info(output_filename)
     logger.info(logical_timestamp)
     logger.info(config)
+    logger.info(historical)
 
     response = requests.get(url)
     with open(output_filename, 'wb') as f:

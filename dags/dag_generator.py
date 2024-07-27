@@ -78,7 +78,7 @@ def create_dag(scrape_dir_path: str) -> DAG:
             if task_id == 'extract':
                 task_kwargs.update({
                     'url': dag_params.get('url'),
-                    'output_filename': '{{ dag.dag_id }}_extract_to_transform_{{ ts }}.{}'.format(file_extension),
+                    'output_filename': '{{ dag.dag_id }}_extract_to_transform_{{ ts }}',
                     'logical_timestamp': '{{ ts }}',
                     'config': config,
                 })
