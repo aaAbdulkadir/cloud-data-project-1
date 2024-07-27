@@ -11,6 +11,7 @@ def extract(
         output_filename (str): _description_
     """
     import logging
+    import requests
 
     logger = logging.getLogger('extract')
 
@@ -18,6 +19,10 @@ def extract(
     logger.info(output_filename)
     logger.info(logical_timestamp)
     logger.info(config)
+
+    response = requests.get(url)
+    with open(output_filename, 'wb') as f:
+        f.write(response.content)
 
     return 1
 
@@ -34,5 +39,10 @@ def transform(input_filename: str, output_filename: str) -> None:
 
     logger.info(input_filename)
     logger.info(output_filename)
+
+    with open(input_filename, 'r') as f:
+        data = f.read()
+
+    logger.info(data)
 
     return 1
