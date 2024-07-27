@@ -72,4 +72,4 @@ class TestDAGGenerator(TestBase):
 
     def test_create_dag(self):
 
-        create_dag(self.dummy_dag_dir)
+        create_dag(self.dummy_dag_yml)

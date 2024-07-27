@@ -26,6 +26,11 @@ dummy_dag:
       python_callable: transform
       dependencies:
         - extract
+
+      transform_2:
+        python_callable: transform
+        dependencies:
+          - extract
         
     load:
       mode: append

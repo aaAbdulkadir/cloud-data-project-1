@@ -34,13 +34,12 @@ def import_functions(functions_filepath: str):
     spec.loader.exec_module(module)
     return module
 
-def create_dag(scrape_dir_path: str) -> DAG:
+def create_dag(yml_file_path: str) -> DAG:
     """Create a DAG from the configuration and functions in the specified directory."""
 
-    scrape_dir  = os.path.basename(scrape_dir_path)
-    yml_file_path = os.path.join(scrape_dir_path, f'{scrape_dir}.yml')
     dag_id = os.path.basename(yml_file_path).split('.')[0]
     dag_params = load_yml_file(yml_file_path)[dag_id]
+    scrape_dir_path = os.path.dirname(yml_file_path)
     load_dag_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'load_to_db.py')
 
     # Load functions from the specified functions file
