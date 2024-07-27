@@ -46,6 +46,9 @@ def transform(input_filename: str, output_filename: str) -> int:
 
     logger.info(data)
 
-    pd.DataFrame(data).to_csv(output_filename, index=False)
+    rows = [data.split(',')]
+    df = pd.DataFrame(rows, columns=['Column1', 'Column2', 'Column3'])
+
+    df.to_csv(output_filename, index=False)
 
     return 1
