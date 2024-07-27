@@ -68,6 +68,7 @@ class TestDAGGenerator(TestBase):
         ) == 1
 
         os.remove(self.dummy_dag_extract_filename)
+        os.remove(self.dummy_dag_transform_filename)
 
     def test_create_dag(self):
 
