@@ -72,7 +72,6 @@ def create_dag(scrape_dir_path: str) -> DAG:
                 python_callable = getattr(functions, task_params.get('python_callable'))
 
             task_kwargs = {
-                **config,  
                 **task_params.get('kwargs', {}),  
             }
             
@@ -81,6 +80,7 @@ def create_dag(scrape_dir_path: str) -> DAG:
                     'url': dag_params.get('url'),
                     'output_filename': '{{ dag.dag_id }}_extract_to_transform_{{ ts }}.{}'.format(file_extension),
                     'logical_timestamp': '{{ ts }}',
+                    'config': config,
                 })
             elif task_id == 'transform':
                 task_kwargs.update({
