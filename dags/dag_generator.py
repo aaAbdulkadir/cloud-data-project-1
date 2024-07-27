@@ -42,8 +42,6 @@ def create_dag(scrape_dir_path: str) -> DAG:
         config_path = os.path.join(scrape_dir_path, dag_params['config_path'])
         config = load_json_file(config_path)
 
-    file_extension = dag_params.get('tasks', {}).get('extract', {}).get('file_extension', 'csv')
-
     default_args = {
         'owner': dag_params.get('owner', 'airflow'),
         'depends_on_past': False,
@@ -52,6 +50,7 @@ def create_dag(scrape_dir_path: str) -> DAG:
         'email_on_success': dag_params.get('email_on_success', False),
         'email_on_retry': dag_params.get('email_on_retry', False),
         'email': [dag_params.get('email')],
+        'file_extension': dag_params.get('tasks', {}).get('extract', {}).get('file_extension', 'csv')
     }
 
     dag = DAG(
@@ -78,13 +77,13 @@ def create_dag(scrape_dir_path: str) -> DAG:
             if task_id == 'extract':
                 task_kwargs.update({
                     'url': dag_params.get('url'),
-                    'output_filename': '{{ dag.dag_id }}_extract_to_transform_{{ ts }}',
+                    'output_filename': '{{ dag.dag_id }}_extract_to_transform_{{ ts }}.{{ file_extension }}',
                     'logical_timestamp': '{{ ts }}',
                     'config': config,
                 })
             elif task_id == 'transform':
                 task_kwargs.update({
-                    'input_filename': '{{ dag.dag_id }}_extract_to_transform_{{ ts }}.{}'.format(file_extension),
+                    'input_filename': '{{ dag.dag_id }}_extract_to_transform_{{ ts }}.{{ file_extension }}',
                     'output_filename': '{{ dag.dag_id }}_transform_to_load_{{ ts }}.csv',
                 })
             elif task_id == 'load':
