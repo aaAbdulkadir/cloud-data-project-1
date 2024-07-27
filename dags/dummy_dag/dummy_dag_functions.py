@@ -21,7 +21,7 @@ def extract(
     logger.info(config)
     logger.info(historical)
 
-    with open(output_filename, 'wb') as f:
+    with open(output_filename, 'w') as f:
         f.write('Testing')
 
     return 1
