@@ -21,7 +21,7 @@ EXTRACT_TO_TRANSFROM = (
 TRANSFORM_TO_LOAD = (
     STAGING_DATA + '{{ dag.dag_id }}_transform_to_load_{{ ts }}.csv'
 )
-S3_STAGING_BUCKET = os.getenv('S3_STAGING_BUCKET=')
+S3_STAGING_BUCKET = os.getenv('S3_STAGING_BUCKET')
 
 
 def load_yml_file(yml_file_path: str) -> dict:
@@ -95,7 +95,7 @@ def create_dag(yml_file_path: str) -> DAG:
             op_kwargs={
                 'local_file_path': EXTRACT_TO_TRANSFROM,
                 'bucket': S3_STAGING_BUCKET,
-                's3_key': 'your_s3_key',  # Replace with your desired S3 key
+                's3_key': dag_id, 
             },
             retries=0
         )
@@ -119,7 +119,7 @@ def create_dag(yml_file_path: str) -> DAG:
             op_kwargs={
                 'local_file_path': TRANSFORM_TO_LOAD,
                 'bucket': S3_STAGING_BUCKET,
-                's3_key': 'your_s3_key',  # Replace with your desired S3 key
+                's3_key': dag_id, 
             },
             retries=0
         )
