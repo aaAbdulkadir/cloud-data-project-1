@@ -24,19 +24,10 @@ dummy_dag:
 
     transform:
       python_callable: transform
-      dependencies:
-        - extract
-
-      transform_2:
-        python_callable: transform
-        dependencies:
-          - extract
         
     load:
       mode: append
       dataset_name: dummy_dag
-      dependencies:
-        - transform
       fields:
         - name: Date
           type: Date

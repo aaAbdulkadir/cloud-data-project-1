@@ -7,6 +7,11 @@ import importlib
 import json
 from datetime import timedelta
 
+from airflow_to_aws import (
+    upload_to_s3,
+    load_to_rds,
+)
+
 AIRFLOW_HOME = '/home/ubuntu/airflow'
 STAGING_DATA = AIRFLOW_HOME + '/staging_data/'
 
@@ -16,6 +21,8 @@ EXTRACT_TO_TRANSFROM = (
 TRANSFORM_TO_LOAD = (
     STAGING_DATA + '{{ dag.dag_id }}_transform_to_load_{{ ts }}.csv'
 )
+S3_STAGING_BUCKET = os.getenv('S3_STAGING_BUCKET=')
+
 
 def load_yml_file(yml_file_path: str) -> dict:
     """Load DAG configuration from a YAML file."""
@@ -36,16 +43,13 @@ def import_functions(functions_filepath: str):
 
 def create_dag(yml_file_path: str) -> DAG:
     """Create a DAG from the configuration and functions in the specified directory."""
-
     dag_id = os.path.basename(yml_file_path).split('.')[0]
     dag_params = load_yml_file(yml_file_path)[dag_id]
     scrape_dir_path = os.path.dirname(yml_file_path)
-    load_dag_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'load_to_db.py')
 
     # Load functions from the specified functions file
     functions_filepath = os.path.join(scrape_dir_path, dag_params['python_callable_file'])
     functions = import_functions(functions_filepath)
-    load_to_db = import_functions(load_dag_filepath)
 
     config = {}
     if 'config_path' in dag_params:
@@ -70,53 +74,69 @@ def create_dag(yml_file_path: str) -> DAG:
         start_date=dag_params.get('start_date', pendulum.now('UTC')),
         catchup=dag_params.get('catchup', False),
     )
-
     with dag:
-        tasks = {}
+        extract = PythonOperator(
+            task_id='extract',
+            python_callable=getattr(functions, dag_params['tasks']['extract']['python_callable']),
+            op_kwargs={
+                'url': dag_params.get('url'),
+                'output_filename': EXTRACT_TO_TRANSFROM,
+                'logical_timestamp': '{{ ts }}',
+                'config': config,
+                **dag_params['tasks']['extract'].get('kwargs', {})
+            },
+            retries=dag_params['tasks']['extract'].get('retries', 0),
+            retry_delay=timedelta(seconds=dag_params['tasks']['extract'].get('retry_delay', 15)),
+        )
 
-        for task_id, task_params in dag_params.get('tasks', {}).items():
-            if task_id == 'load':
-                python_callable = getattr(load_to_db, 'load')
-            else:
-                python_callable = getattr(functions, task_params.get('python_callable'))
+        extract_to_s3 = PythonOperator(
+            task_id='extract_to_s3',
+            python_callable=upload_to_s3,
+            op_kwargs={
+                'local_file_path': EXTRACT_TO_TRANSFROM,
+                'bucket': S3_STAGING_BUCKET,
+                's3_key': 'your_s3_key',  # Replace with your desired S3 key
+            },
+            retries=0
+        )
 
-            task_kwargs = {
-                **task_params.get('kwargs', {}),  
-            }
-            
-            if task_id == 'extract':
-                task_kwargs.update({
-                    'url': dag_params.get('url'),
-                    'output_filename': EXTRACT_TO_TRANSFROM,
-                    'logical_timestamp': '{{ ts }}',
-                    'config': config,
-                })
-            elif task_id == 'transform':
-                task_kwargs.update({
-                    'input_filename': EXTRACT_TO_TRANSFROM,
-                    'output_filename': TRANSFORM_TO_LOAD,
-                })
-            elif task_id == 'load':
-                task_kwargs.update({
-                    'input_filename': TRANSFORM_TO_LOAD,
-                    'mode': task_params.get('mode'),
-                    'dataset_name': task_params.get('dataset_name'),
-                    'fields': task_params.get('fields'),
-                })
+        transform = PythonOperator(
+            task_id='transform',
+            python_callable=getattr(functions, dag_params['tasks']['transform']['python_callable']),
+            op_kwargs={
+                'input_filename': EXTRACT_TO_TRANSFROM,
+                'output_filename': TRANSFORM_TO_LOAD,
+                'config': config,
+                **dag_params['tasks']['transform'].get('kwargs', {})
+            },
+            retries=dag_params['tasks']['transform'].get('retries', 0),
+            retry_delay=timedelta(seconds=dag_params['tasks']['transform'].get('retry_delay', 15)),
+        )
 
-            task = PythonOperator(
-                task_id=task_id,
-                python_callable=python_callable,
-                retries=task_params.get('retries', 0),
-                retry_delay=timedelta(seconds=task_params.get('retry_delay', 15)),
-                op_kwargs=task_kwargs,
-                dag=dag
-            )
-            tasks[task_id] = task
+        transform_to_s3 = PythonOperator(
+            task_id='transform_to_s3',
+            python_callable=upload_to_s3,
+            op_kwargs={
+                'local_file_path': TRANSFORM_TO_LOAD,
+                'bucket': S3_STAGING_BUCKET,
+                's3_key': 'your_s3_key',  # Replace with your desired S3 key
+            },
+            retries=0
+        )
 
-        for task_id, task_params in dag_params.get('tasks', {}).items():
-            dependencies = task_params.get('dependencies', [])
-            for dependency in dependencies:
-                tasks[dependency] >> tasks[task_id]
+        load = PythonOperator(
+            task_id='load',
+            python_callable=load_to_rds,
+            op_kwargs={
+                'input_filename': TRANSFORM_TO_LOAD,
+                'mode': dag_params.get('tasks', {}).get('load', {}).get('mode'),
+                'dataset_name': dag_params.get('tasks', {}).get('load', {}).get('dataset_name'),
+                'fields': dag_params.get('tasks', {}).get('load', {}).get('fields'),                
+            },
+            retries=dag_params['tasks']['load'].get('retries', 0),
+            retry_delay=timedelta(seconds=dag_params['tasks']['load'].get('retry_delay', 15)),
+        )
+
+        extract >> extract_to_s3 >> transform >> transform_to_s3 >> load
 
     return dag

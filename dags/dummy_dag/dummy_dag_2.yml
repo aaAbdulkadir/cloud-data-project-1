@@ -1,6 +1,6 @@
 dummy_dag_2:
   owner: Abdulkadir
-  description: dummy dag no transform
+  description: dummy dag 2
   schedule_interval: '0 9 * * *'
   url: https://www.google.com
 
@@ -10,23 +10,17 @@ dummy_dag_2:
   email: a.abdulkadir@hotmail.com
   
   python_callable_file: dummy_dag_functions.py  
-  config_path: config/config.json
   
   tasks:
     extract:
       python_callable: extract
-      file_extension: csv
-      retries: 3
-      retry_delay: 1200
-      kwargs:
-        historical: True
-        test: 'Yes'
+
+    transform:
+      python_callable: transform
         
     load:
       mode: append
       dataset_name: dummy_dag
-      dependencies:
-        - extract
       fields:
         - name: Date
           type: Date

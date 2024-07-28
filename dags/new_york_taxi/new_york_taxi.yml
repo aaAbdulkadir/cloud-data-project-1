@@ -10,6 +10,7 @@ new_york_taxi:
   email: a.abdulkadir@hotmail.com
   
   python_callable_file: new_york_taxi_functions.py  
+  config_path: config/config.json
   
   tasks:
     extract:
@@ -17,14 +18,10 @@ new_york_taxi:
 
     transform:
       python_callable: transform
-      dependencies:
-        - extract
         
     load:
       mode: append
       dataset_name: new_york_taxi
-      dependencies:
-        - transform
       fields:
         - name: Date
           type: Date
