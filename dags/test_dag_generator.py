@@ -72,4 +72,6 @@ class TestDAGGenerator(TestBase):
 
     def test_create_dag(self):
 
-        create_dag(self.dummy_dag_yml)
+        dag = create_dag(self.dummy_dag_yml)
+
+        print('yes')

@@ -24,7 +24,6 @@ def extract(
     with open(output_filename, 'w') as f:
         f.write('Testing,1,animal')
 
-    return 1
 
 def transform(input_filename: str, output_filename: str) -> int:
     """Dummy transform for testing purposes.
@@ -51,4 +50,3 @@ def transform(input_filename: str, output_filename: str) -> int:
 
     df.to_csv(output_filename, index=False)
 
-    return 1

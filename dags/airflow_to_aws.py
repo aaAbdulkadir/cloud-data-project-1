@@ -31,6 +31,30 @@ def upload_to_s3(local_file_path: str, bucket: str, s3_key: str) -> None:
 
     except Exception as e:
         raise AirflowException(f"Unexpected error: {str(e)}")
+    
+    
+def retrieve_from_s3(bucket: str, s3_key: str, local_file_path: str) -> None:
+    """
+    Retrieve a file from S3 and save it to the local filesystem.
+
+    Args:
+        bucket (str): The S3 bucket name
+        s3_key (str): The S3 object key (path in the bucket) of the file to retrieve
+        local_file_path (str): The path where the file should be saved locally
+
+    Raises:
+        AirflowException: If there's an error during retrieval or file saving
+    """
+    logger = logging.getLogger('S3 Transfer')
+
+    s3_client = boto3.client('s3')
+
+    try:
+        s3_client.download_file(bucket, s3_key, local_file_path)
+        logger.info(f"Successfully retrieved s3://{bucket}/{s3_key} to {local_file_path}")
+
+    except Exception as e:
+        raise AirflowException(f"Unexpected error: {str(e)}")
 
 
 def load_to_rds(input_filename: str, mode: str, dataset_name: str, fields: dict) -> None:
