@@ -48,8 +48,7 @@ def task_wrapper(task_function, **kwargs):
         url = kwargs['url']
         logical_timestamp = kwargs['logical_timestamp']
         config = kwargs['config']
-        historical = kwargs.get('historical')
-        task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config, historical=historical)
+        task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config)
     elif task_id == 'transform':
         input_filename = kwargs['input_filename']
         output_filename = kwargs['output_filename']
