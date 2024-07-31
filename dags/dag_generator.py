@@ -65,7 +65,7 @@ def task_wrapper(task_function, next_task_id, **kwargs):
         url = kwargs['url']
         logical_timestamp = kwargs['logical_timestamp']
         config = kwargs['config']
-        logger.info(**kwargs)
+        print(**kwargs)
         task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config, **kwargs)
     elif task_id == 'load':
         dataset_name = kwargs['dataset_name']
