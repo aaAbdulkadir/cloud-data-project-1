@@ -70,7 +70,7 @@ def task_wrapper(task_function, next_task_id, **kwargs):
         task_function(dataset_name=dataset_name, input_filename=input_filename, mode=mode, keyfields=keyfields)
     else:
         input_filename = kwargs['input_filename']
-        yml_kwargs = kwargs.get('kwargs', {})
+        params = kwargs.get('kwargs', {})
         task_function(input_filename=input_filename, output_filename=output_filename, params=params)
 
     ti.xcom_push(key='output_filename', value=output_filename)
@@ -148,7 +148,7 @@ def create_dag(yml_file_path: str) -> DAG:
             task = PythonOperator(
                 task_id=task_id,
                 python_callable=task_wrapper,
-                op_kwargs={'task_function': python_callable, 'next_task_id': next_task_id, 'params': params},
+                op_kwargs={**params, 'task_function': python_callable, 'next_task_id': next_task_id},
                 retries=task_params.get('retries', 0),
                 retry_delay=timedelta(seconds=task_params.get('retry_delay', 15)),
                 provide_context=True,
