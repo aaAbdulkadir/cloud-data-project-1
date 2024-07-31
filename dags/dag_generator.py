@@ -61,7 +61,7 @@ def task_wrapper(task_function, next_task_id, **kwargs):
         config = kwargs['config']
         # Include all kwargs from the YAML configuration
         yml_kwargs = kwargs.get('kwargs', {})
-        task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config, **yml_kwargs)
+        task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config, kwargs=yml_kwargs)
     elif task_id == 'load':
         dataset_name = kwargs['dataset_name']
         input_filename = kwargs['input_filename']
