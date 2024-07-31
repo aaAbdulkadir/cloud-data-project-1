@@ -60,8 +60,8 @@ def task_wrapper(task_function, next_task_id, **kwargs):
         logical_timestamp = kwargs['logical_timestamp']
         config = kwargs['config']
         # Include all kwargs from the YAML configuration
-        yml_kwargs = kwargs.get('kwargs', {})
-        task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config, kwargs=yml_kwargs)
+        params = kwargs.get('params', {})
+        task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config, params=params)
     elif task_id == 'load':
         dataset_name = kwargs['dataset_name']
         input_filename = kwargs['input_filename']
@@ -71,7 +71,7 @@ def task_wrapper(task_function, next_task_id, **kwargs):
     else:
         input_filename = kwargs['input_filename']
         yml_kwargs = kwargs.get('kwargs', {})
-        task_function(input_filename=input_filename, output_filename=output_filename, **yml_kwargs)
+        task_function(input_filename=input_filename, output_filename=output_filename, params=params)
 
     ti.xcom_push(key='output_filename', value=output_filename)
 
@@ -119,12 +119,12 @@ def create_dag(yml_file_path: str) -> DAG:
             else:
                 python_callable = getattr(functions, task_params.get('python_callable'))
 
-            task_kwargs = {**task_params.get('kwargs', {})}
+            params = {**task_params.get('params', {})}
 
             next_task_id = task_order[idx + 1] if idx + 1 < len(task_order) else ''
 
             if task_id == 'extract':
-                task_kwargs.update({
+                params.update({
                     'url': dag_params.get('url'),
                     'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}'),
                     'logical_timestamp': '{{ ts }}',
@@ -132,7 +132,7 @@ def create_dag(yml_file_path: str) -> DAG:
                 })
             elif task_id == 'load':
                 previous_task_id = task_order[idx - 1]
-                task_kwargs.update({
+                params.update({
                     'input_filename': "{{ ti.xcom_pull(task_ids='" + previous_task_id + "', key='output_filename') }}",
                     'mode': task_params.get('mode'),
                     'dataset_name': task_params.get('dataset_name'),
@@ -140,7 +140,7 @@ def create_dag(yml_file_path: str) -> DAG:
                 })
             else:
                 previous_task_id = task_order[idx - 1]
-                task_kwargs.update({
+                params.update({
                     'input_filename': "{{ ti.xcom_pull(task_ids='" + previous_task_id + "', key='output_filename') }}",
                     'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}')
                 })
@@ -148,7 +148,7 @@ def create_dag(yml_file_path: str) -> DAG:
             task = PythonOperator(
                 task_id=task_id,
                 python_callable=task_wrapper,
-                op_kwargs={**task_kwargs, 'task_function': python_callable, 'next_task_id': next_task_id},
+                op_kwargs={**params, 'task_function': python_callable, 'next_task_id': next_task_id},
                 retries=task_params.get('retries', 0),
                 retry_delay=timedelta(seconds=task_params.get('retry_delay', 15)),
                 provide_context=True,

@@ -18,7 +18,7 @@ dummy_dag:
       file_extension: csv
       retries: 3
       retry_delay: 1200
-      kwargs:
+      params:
         historical: True
         test: 'Yes'
 
