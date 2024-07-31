@@ -19,7 +19,7 @@ def extract(
     logger.info(output_filename)
     logger.info(logical_timestamp)
     logger.info(config)
-    logger.info(params['historical'])
+    logger.info(params)
 
     with open(output_filename, 'w') as f:
         f.write('Testing,1,animal')
