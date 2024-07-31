@@ -3,7 +3,7 @@ def extract(
     output_filename: str,
     logical_timestamp: "pendulum.datetime",
     config: dict,
-    params,
+    params: dict,
 ) -> int:
     """Dummy extract for testing purposes.
 
