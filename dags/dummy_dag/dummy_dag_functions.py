@@ -3,7 +3,7 @@ def extract(
     output_filename: str,
     logical_timestamp: "pendulum.datetime",
     config: dict,
-    params: dict,
+    historical: bool,
 ) -> int:
     """Dummy extract for testing purposes.
 
@@ -19,7 +19,7 @@ def extract(
     logger.info(output_filename)
     logger.info(logical_timestamp)
     logger.info(config)
-    logger.info(params)
+    logger.info(historical)
 
     with open(output_filename, 'w') as f:
         f.write('Testing,1,animal')

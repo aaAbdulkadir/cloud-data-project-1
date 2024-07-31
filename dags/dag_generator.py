@@ -45,12 +45,12 @@ def load_config_if_exists(scrape_dir_path: str, dag_params: dict) -> dict:
         config = load_json_file(config_path)
     return config
 
-def load_in_params(task_params: dict) -> dict:
-    """Load additional parameters if they exist."""
-    params = {}
-    if 'params' in task_params:
-        params = task_params['params']
-    return params
+# def load_in_params(task_params: dict) -> dict:
+#     """Load additional parameters if they exist."""
+#     params = {}
+#     if 'params' in task_params:
+#         params = task_params['params']
+#     return params
 
 def task_wrapper(task_function, next_task_id, **kwargs):
     ti = kwargs['ti']
@@ -123,7 +123,7 @@ def create_dag(yml_file_path: str) -> DAG:
                 python_callable = load_to_rds
             else:
                 python_callable = getattr(functions, task_params.get('python_callable'))
-                params = load_in_params(task_params)
+                # params = load_in_params(task_params)
 
             task_kwargs = {**task_params.get('params', {})}
 
@@ -135,7 +135,7 @@ def create_dag(yml_file_path: str) -> DAG:
                     'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}'),
                     'logical_timestamp': '{{ ts }}',
                     'config': config,
-                    'params': params
+                    # 'params': params
                 })
             elif task_id == 'load':
                 previous_task_id = task_order[idx - 1]
@@ -150,7 +150,7 @@ def create_dag(yml_file_path: str) -> DAG:
                 task_kwargs.update({
                     'input_filename': "{{ ti.xcom_pull(task_ids='" + previous_task_id + "', key='output_filename') }}",
                     'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}'),
-                    'params': params
+                    # 'params': params
                 })
 
             task = PythonOperator(
