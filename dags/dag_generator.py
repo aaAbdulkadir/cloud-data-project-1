@@ -53,6 +53,9 @@ def task_wrapper(task_function, next_task_id, **kwargs):
     file_extension = kwargs['dag'].default_args['file_extension']
 
     output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
+    
+    print(f"task_id: {task_id}, dag_id: {dag_id}, ts: {ts}, file_extension: {file_extension}")
+    print(f"kwargs: {kwargs}")
 
     if task_id == 'extract':
         url = kwargs['url']  
