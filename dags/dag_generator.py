@@ -53,13 +53,12 @@ def task_wrapper(task_function, next_task_id, **kwargs):
     file_extension = kwargs['dag'].default_args['file_extension']
 
     output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
-    remaining_kwargs = {k: v for k, v in kwargs.items() if k not in {'url', 'output_filename'}}
 
     if task_id == 'extract':
         url = kwargs['url']  
         logical_timestamp = kwargs['logical_timestamp']
         config = kwargs.get('config', {})
-        task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config, **remaining_kwargs)
+        task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config, **kwargs)
     elif task_id == 'load':
         dataset_name = kwargs['dataset_name']
         input_filename = kwargs['input_filename']
@@ -68,7 +67,7 @@ def task_wrapper(task_function, next_task_id, **kwargs):
         task_function(dataset_name=dataset_name, input_filename=input_filename, mode=mode, keyfields=keyfields)
     else:
         input_filename = kwargs['input_filename']
-        task_function(input_filename=input_filename, output_filename=output_filename, **remaining_kwargs)
+        task_function(input_filename=input_filename, output_filename=output_filename, **kwargs)
 
     ti.xcom_push(key='output_filename', value=output_filename)
 
@@ -159,4 +158,3 @@ def create_dag(yml_file_path: str) -> DAG:
                 tasks[dependency] >> tasks[task_id]
 
     return dag
-
