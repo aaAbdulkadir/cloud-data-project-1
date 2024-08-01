@@ -146,8 +146,8 @@ def create_dag(yml_file_path: str) -> DAG:
 
             task = PythonOperator(
                 task_id=task_id,
-                python_callable=task_wrapper,
-                op_kwargs={'task_function': python_callable, 'next_task_id': next_task_id, **task_kwargs},
+                python_callable=python_callable,
+                op_kwargs={'next_task_id': next_task_id, **task_kwargs},
                 retries=task_params.get('retries', 0),
                 retry_delay=timedelta(seconds=task_params.get('retry_delay', 15)),
                 provide_context=True,
