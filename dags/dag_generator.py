@@ -52,7 +52,8 @@ def load_config_if_exists(scrape_dir_path: str, dag_params: dict) -> dict:
 #         params = task_params['params']
 #     return params
 
-def task_wrapper(task_function, next_task_id, kwargs):
+ ## PARAMS ISSUE FIX
+def task_wrapper(task_function, next_task_id, **kwargs):
     ti = kwargs['ti']
     task_id = kwargs['task'].task_id
     dag_id = kwargs['dag'].dag_id
@@ -65,8 +66,7 @@ def task_wrapper(task_function, next_task_id, kwargs):
         url = kwargs['url']
         logical_timestamp = kwargs['logical_timestamp']
         config = kwargs['config']
-        params = kwargs.get('params', {})
-        task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config, params=params)
+        task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config, **kwargs)
     elif task_id == 'load':
         dataset_name = kwargs['dataset_name']
         input_filename = kwargs['input_filename']
@@ -75,8 +75,7 @@ def task_wrapper(task_function, next_task_id, kwargs):
         task_function(dataset_name=dataset_name, input_filename=input_filename, mode=mode, keyfields=keyfields)
     else:
         input_filename = kwargs['input_filename']
-        params = kwargs.get('params', {})
-        task_function(input_filename=input_filename, output_filename=output_filename, params=params)
+        task_function(input_filename=input_filename, output_filename=output_filename, **kwargs)
 
     ti.xcom_push(key='output_filename', value=output_filename)
 
@@ -156,7 +155,7 @@ def create_dag(yml_file_path: str) -> DAG:
             task = PythonOperator(
                 task_id=task_id,
                 python_callable=task_wrapper,
-                op_kwargs={**task_kwargs, 'task_function': python_callable, 'next_task_id': next_task_id},
+                op_kwargs={'task_function': python_callable, 'next_task_id': next_task_id, **task_kwargs},
                 retries=task_params.get('retries', 0),
                 retry_delay=timedelta(seconds=task_params.get('retry_delay', 15)),
                 provide_context=True,
