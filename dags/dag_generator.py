@@ -100,6 +100,7 @@ def create_dag(yml_file_path: str) -> DAG:
                     'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}'),
                     'logical_timestamp': '{{ ts }}',
                     'config': config,
+                    **task_params.get('params', {})
                 })
             elif task_id == 'load':
                 task_kwargs.update({
@@ -112,6 +113,7 @@ def create_dag(yml_file_path: str) -> DAG:
                 task_kwargs.update({
                     'input_filename': "{{ ti.xcom_pull(task_ids='" + previous_task_id + "', key='output_filename') }}",
                     'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}'),
+                    **task_params.get('params', {})
                 })
 
             task = PythonOperator(
