@@ -58,7 +58,7 @@ def task_wrapper(task_function, next_task_id, **kwargs):
     print(f"kwargs: {kwargs}")
     
     if task_id == 'extract':
-        url = kwargs.pop('URL')
+        url = kwargs.pop('url')
         logical_timestamp = kwargs.pop('logical_timestamp')
         config = kwargs.get('config', {})
         task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config, **kwargs)
