@@ -38,31 +38,35 @@ def import_functions(functions_filepath: str):
     return module
 
 def load_config_if_exists(scrape_dir_path: str, dag_params: dict) -> dict:
-    """Load configuration file if it exists."""
+    """Load configuration file if it exists."""#
     config = {}
     if 'config_path' in dag_params:
         config_path = os.path.join(scrape_dir_path, dag_params['config_path'])
         config = load_json_file(config_path)
     return config
 
+# def load_in_params(task_params: dict) -> dict:
+#     """Load additional parameters if they exist."""
+#     params = {}
+#     if 'params' in task_params:
+#         params = task_params['params']
+#     return params
+
+ ## PARAMS ISSUE FIX
 def task_wrapper(task_function, next_task_id, **kwargs):
     ti = kwargs['ti']
     task_id = kwargs['task'].task_id
     dag_id = kwargs['dag'].dag_id
     ts = kwargs['ts']
-    file_extension = kwargs['file_extension']
+    file_extension = kwargs['dag'].default_args['file_extension']
 
     output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
 
-    # Separate common kwargs and task-specific kwargs
-    common_kwargs = {'ti': ti, 'task': kwargs['task'], 'dag': kwargs['dag'], 'ts': kwargs['ts'], 'file_extension': file_extension}
-    task_specific_kwargs = {k: v for k, v in kwargs.items() if k not in common_kwargs}
-
     if task_id == 'extract':
-        url = kwargs['url']
+        url = kwargs['url']  
         logical_timestamp = kwargs['logical_timestamp']
-        config = kwargs['config']
-        task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config, **task_specific_kwargs)
+        config = kwargs.get('config', {})
+        task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config, **kwargs)
     elif task_id == 'load':
         dataset_name = kwargs['dataset_name']
         input_filename = kwargs['input_filename']
@@ -71,7 +75,7 @@ def task_wrapper(task_function, next_task_id, **kwargs):
         task_function(dataset_name=dataset_name, input_filename=input_filename, mode=mode, keyfields=keyfields)
     else:
         input_filename = kwargs['input_filename']
-        task_function(input_filename=input_filename, output_filename=output_filename, **task_specific_kwargs)
+        task_function(input_filename=input_filename, output_filename=output_filename, **kwargs)
 
     ti.xcom_push(key='output_filename', value=output_filename)
 
@@ -118,6 +122,7 @@ def create_dag(yml_file_path: str) -> DAG:
                 python_callable = load_to_rds
             else:
                 python_callable = getattr(functions, task_params.get('python_callable'))
+                # params = load_in_params(task_params)
 
             task_kwargs = {**task_params.get('params', {})}
 
@@ -129,6 +134,7 @@ def create_dag(yml_file_path: str) -> DAG:
                     'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}'),
                     'logical_timestamp': '{{ ts }}',
                     'config': config,
+                    # 'params': params
                 })
             elif task_id == 'load':
                 previous_task_id = task_order[idx - 1]
@@ -143,12 +149,13 @@ def create_dag(yml_file_path: str) -> DAG:
                 task_kwargs.update({
                     'input_filename': "{{ ti.xcom_pull(task_ids='" + previous_task_id + "', key='output_filename') }}",
                     'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}'),
+                    # 'params': params
                 })
 
             task = PythonOperator(
                 task_id=task_id,
                 python_callable=task_wrapper,
-                op_kwargs={'task_function': python_callable, 'next_task_id': next_task_id, 'file_extension': default_args['file_extension'], **task_kwargs},
+                op_kwargs={**task_kwargs, 'task_function': python_callable, 'next_task_id': next_task_id},
                 retries=task_params.get('retries', 0),
                 retry_delay=timedelta(seconds=task_params.get('retry_delay', 15)),
                 provide_context=True,
