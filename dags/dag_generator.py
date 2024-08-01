@@ -58,18 +58,18 @@ def task_wrapper(task_function, next_task_id, **kwargs):
     print(f"kwargs: {kwargs}")
     
     if task_id == 'extract':
-        url = kwargs['url']  
-        logical_timestamp = kwargs['logical_timestamp']
+        url = kwargs.pop('URL')
+        logical_timestamp = kwargs.pop('logical_timestamp')
         config = kwargs.get('config', {})
         task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config, **kwargs)
     elif task_id == 'load':
-        dataset_name = kwargs['dataset_name']
-        input_filename = kwargs['input_filename']
-        mode = kwargs['mode']
-        keyfields = kwargs['keyfields']
+        dataset_name = kwargs.pop('dataset_name']
+        input_filename = kwargs.pop('input_filename')
+        mode = kwargs.pop('mode')
+        keyfields = kwargs.pop('keyfields')
         task_function(dataset_name=dataset_name, input_filename=input_filename, mode=mode, keyfields=keyfields)
     else:
-        input_filename = kwargs['input_filename']
+        input_filename = kwargs.pop('input_filename')
         task_function(input_filename=input_filename, output_filename=output_filename, **kwargs)
 
     ti.xcom_push(key='output_filename', value=output_filename)
