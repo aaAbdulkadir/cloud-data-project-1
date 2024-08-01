@@ -63,7 +63,7 @@ def task_wrapper(task_function, next_task_id, **kwargs):
         config = kwargs.get('config', {})
         task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config, **kwargs)
     elif task_id == 'load':
-        dataset_name = kwargs.pop('dataset_name']
+        dataset_name = kwargs.pop('dataset_name')
         input_filename = kwargs.pop('input_filename')
         mode = kwargs.pop('mode')
         keyfields = kwargs.pop('keyfields')
