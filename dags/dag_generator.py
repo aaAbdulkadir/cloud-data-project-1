@@ -90,8 +90,8 @@ def create_dag(yml_file_path: str) -> DAG:
                 python_callable = getattr(functions, task_params.get('python_callable'))
 
             task_kwargs = {
-                'params': task_params.get('params', {}),
-                'config': config,
+                **task_params.get('params', {}),  
+                'config': config
             }
 
             next_task_id = task_order[idx + 1] if idx + 1 < len(task_order) else ''
@@ -125,6 +125,7 @@ def create_dag(yml_file_path: str) -> DAG:
                 provide_context=True,
                 dag=dag
             )
+
             tasks[task_id] = task
 
         for task_id, task_params in dag_params.get('tasks', {}).items():
