@@ -89,7 +89,10 @@ def create_dag(yml_file_path: str) -> DAG:
             else:
                 python_callable = getattr(functions, task_params.get('python_callable'))
 
-            task_kwargs = {**task_params.get('params', {})}
+            task_kwargs = {
+                **task_params.get('params', {}),
+                'config': config,
+            }
 
             next_task_id = task_order[idx + 1] if idx + 1 < len(task_order) else ''
             previous_task_id = task_order[idx - 1] if idx > 0 else ''
@@ -99,7 +102,6 @@ def create_dag(yml_file_path: str) -> DAG:
                     'url': dag_params.get('url'),
                     'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}'),
                     'logical_timestamp': '{{ ts }}',
-                    'config': config,
                 })
             elif task_id == 'load':
                 task_kwargs.update({
