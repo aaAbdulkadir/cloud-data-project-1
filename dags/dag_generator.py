@@ -17,6 +17,7 @@ S3_STAGING_BUCKET = os.getenv('S3_STAGING_BUCKET')
 AIRFLOW_HOME = '/home/ubuntu/airflow'
 STAGING_DATA = AIRFLOW_HOME + '/staging_data'
 
+
 def get_filename_template(dag_id, task_id, next_task_id, ts, file_extension):
     return f"{STAGING_DATA}/{dag_id}/{dag_id}_{task_id}_to_{next_task_id}_{ts}.{file_extension}"
 
@@ -58,6 +59,9 @@ def task_wrapper(task_function, next_task_id, **kwargs):
     ts = kwargs['ts']
     file_extension = kwargs['dag'].default_args['file_extension']
 
+    directory = f"{STAGING_DATA}/{dag_id}"
+    os.makedirs(directory, exist_ok=True)
+    
     output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
     
     # pull file from s3 staging bucket
