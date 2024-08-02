@@ -122,6 +122,7 @@ def create_dag(yml_file_path: str) -> DAG:
                 op_kwargs=task_kwargs,
                 retries=task_params.get('retries', 0),
                 retry_delay=timedelta(seconds=task_params.get('retry_delay', 15)),
+                provide_context=True,
                 dag=dag
             )
 

@@ -13,7 +13,7 @@ dummy_dag_2:
   
   tasks:
     extract:
-      python_callable: extract
+      python_callable: extract_2
 
     transform:
       python_callable: transform

@@ -23,6 +23,26 @@ def extract(
 
     with open(output_filename, 'w') as f:
         f.write('Testing,1,animal')
+        
+def extract_2(
+    url: str,
+    output_filename: str,
+) -> int:
+    """Dummy extract for testing purposes.
+
+    Args:
+        url (str): url from yml
+        output_filename (str): output filename
+    """
+    import logging
+
+    logger = logging.getLogger('extract')
+
+    logger.info(url)
+    logger.info(output_filename)
+
+    with open(output_filename, 'w') as f:
+        f.write('Testing,1,animal')
 
 
 def transform(input_filename: str, output_filename: str) -> int:
