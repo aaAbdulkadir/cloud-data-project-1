@@ -18,17 +18,20 @@ AIRFLOW_HOME = '/home/ubuntu/airflow'
 STAGING_DATA = AIRFLOW_HOME + '/staging_data'
 
 def get_filename_template(dag_id, task_id, next_task_id, ts, file_extension):
-    return f"{STAGING_DATA}/{dag_id}_{task_id}_to_{next_task_id}_{ts}.{file_extension}"
+    return f"{STAGING_DATA}/{dag_id}/{dag_id}_{task_id}_to_{next_task_id}_{ts}.{file_extension}"
+
 
 def load_yml_file(yml_file_path: str) -> dict:
     """Load DAG configuration from a YAML file."""
     with open(yml_file_path, 'r') as config_file:
         return yaml.safe_load(config_file)
+    
 
 def load_json_file(json_file_path: str) -> dict:
     """Load JSON configuration file."""
     with open(json_file_path, 'r') as json_file:
         return json.load(json_file)
+    
 
 def import_functions(functions_filepath: str):
     """Import Python functions from the specified filepath."""
@@ -37,14 +40,16 @@ def import_functions(functions_filepath: str):
     spec.loader.exec_module(module)
     return module
 
+
 def load_config_if_exists(scrape_dir_path: str, dag_params: dict) -> dict:
     """Load configuration file if it exists."""
     if 'config_path' in dag_params:
         config_path = os.path.join(scrape_dir_path, dag_params['config_path'])
         config = load_json_file(config_path)
     else:
-        config = None
+        config = {}
     return config
+
 
 def task_wrapper(task_function, next_task_id, **kwargs):
     ti = kwargs['ti']
@@ -52,10 +57,14 @@ def task_wrapper(task_function, next_task_id, **kwargs):
     dag_id = kwargs['dag'].dag_id
     ts = kwargs['ts']
     file_extension = kwargs['dag'].default_args['file_extension']
-    params = kwargs['params']
 
     output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
-
+    
+    # pull file from s3 staging bucket
+    if task_id not in ('extract', 'load'):
+        retrieve_from_s3(bucket=S3_STAGING_BUCKET, s3_key=output_filename, local_file_path=output_filename)
+    
+    # Main python callable 
     if task_id == 'extract':
         url = kwargs['url']
         logical_timestamp = kwargs['logical_timestamp']
@@ -70,8 +79,12 @@ def task_wrapper(task_function, next_task_id, **kwargs):
     else:
         input_filename = kwargs['input_filename']
         task_function(input_filename=input_filename, output_filename=output_filename)
-
+        
+    # Upload output file to S3 staging bucket
+    upload_to_s3(local_file_path=output_filename, bucket=S3_STAGING_BUCKET, s3_key=output_filename)
+    
     ti.xcom_push(key='output_filename', value=output_filename)
+    
 
 def create_dag(yml_file_path: str) -> DAG:
     """Create a DAG from the configuration and functions in the specified directory."""

@@ -63,4 +63,6 @@ def load_to_rds(input_filename: str, mode: str, dataset_name: str, fields: dict)
     Args:
         input_filename (str): _description_
     """
-    pass
+    logger = logging.getLogger('Load')
+    
+    logger.info(f"Loading data from {input_filename} into dataset {dataset_name}")

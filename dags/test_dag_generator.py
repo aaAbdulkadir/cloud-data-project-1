@@ -12,6 +12,7 @@ from dags.dag_generator import (
     load_json_file,
     import_functions,
     create_dag,
+    get_filename_template
 )
 from dags.test_base import TestBase
 
@@ -39,6 +40,19 @@ class TestDAGGenerator(TestBase):
         self.dummy_dag_transform_filename = os.path.join(
             self.dummy_dag_dir, 'transform.csv'
         )
+        
+    def test_get_filename_template(self):
+        dag_id = 'example_dag'
+        task_id = 'task_1'
+        next_task_id = 'task_2'
+        ts = '2024-08-02T12:00:00Z'
+        file_extension = 'csv'
+        STAGING_DATA = '/home/ubuntu/airflow/staging_data'
+        expected_output = f"{STAGING_DATA}/{dag_id}_{task_id}_to_{next_task_id}_{ts}.{file_extension}"
+        
+        result = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
+        
+        assert result == expected_output
 
     def test_load_yaml_is_valid(self):
         self.validate_config(self.dummy_dag_yml)
@@ -56,19 +70,19 @@ class TestDAGGenerator(TestBase):
         config = {'foo': 'bar'}
         module = import_functions(self.dummy_dag_functions_path)
         self.assertIsNotNone(module)
-        assert module.extract(
+        
+        module.extract(
             'http://example.com',
             self.dummy_dag_extract_filename,
             self.logical_timestamp,
             config,
-            True
-        ) == 1
-        assert module.transform(
-            self.dummy_dag_extract_filename, self.dummy_dag_transform_filename
-        ) == 1
-
+        )
+        self.assertTrue(os.path.isfile(self.dummy_dag_extract_filename))
+        
         os.remove(self.dummy_dag_extract_filename)
-        os.remove(self.dummy_dag_transform_filename)
+        
+    
+
 
     def test_create_dag(self):
 

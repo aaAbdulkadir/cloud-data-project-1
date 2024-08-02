@@ -1,17 +1,21 @@
+import logging
+import pandas as pd
+import pendulum
+
 def extract(
     url: str,
     output_filename: str,
-    logical_timestamp: "pendulum.datetime",
-    config: dict,
-) -> int:
+    logical_timestamp: pendulum.DateTime,
+    config: dict
+) -> None:
     """Dummy extract for testing purposes.
 
     Args:
-        url (str): url from yml
-        output_filename (str): output filename
+        url (str): URL from configuration.
+        output_filename (str): Output filename.
+        logical_timestamp (pendulum.DateTime): Logical timestamp for the operation.
+        config (Dict): Configuration dictionary.
     """
-    import logging
-
     logger = logging.getLogger('extract')
 
     logger.info(url)
@@ -21,20 +25,18 @@ def extract(
 
     with open(output_filename, 'w') as f:
         f.write('Testing,1,animal')
-        
+
 def extract_2(
     url: str,
     output_filename: str,
-) -> int:
+) -> None:
     """Dummy extract for testing purposes.
 
     Args:
-        url (str): url from yml
-        output_filename (str): output filename
+        url (str): URL from configuration.
+        output_filename (str): Output filename.
     """
-    import logging
-
-    logger = logging.getLogger('extract')
+    logger = logging.getLogger('extract_2')
 
     logger.info(url)
     logger.info(output_filename)
@@ -42,17 +44,13 @@ def extract_2(
     with open(output_filename, 'w') as f:
         f.write('Testing,1,animal')
 
-
-def transform(input_filename: str, output_filename: str) -> int:
+def transform(input_filename: str, output_filename: str) -> None:
     """Dummy transform for testing purposes.
 
     Args:
-        input_filename (str): input filename for extract output
-        output_filename (str): file to load to
+        input_filename (str): Input filename for extract output.
+        output_filename (str): File to load to.
     """
-    import logging
-    import pandas as pd
-
     logger = logging.getLogger('transform')
 
     logger.info(input_filename)
@@ -67,4 +65,3 @@ def transform(input_filename: str, output_filename: str) -> int:
     df = pd.DataFrame(rows, columns=['Column1', 'Column2', 'Column3'])
 
     df.to_csv(output_filename, index=False)
-
