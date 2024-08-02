@@ -90,7 +90,7 @@ def create_dag(yml_file_path: str) -> DAG:
                 python_callable = getattr(functions, task_params.get('python_callable'))
 
             task_kwargs = {
-                **task_params.get('params', {}),
+                'params': task_params.get('params', {}),
                 'config': config,
             }
 
