@@ -117,7 +117,7 @@ def create_dag(yml_file_path: str) -> DAG:
             else:
                 python_callable = getattr(functions, task_params.get('python_callable'))
 
-            args = {task_params.get('params', {})}
+            args = {**task_params.get('params', {})}
 
             next_task_id = task_order[idx + 1] if idx + 1 < len(task_order) else ''
 

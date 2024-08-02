@@ -20,7 +20,7 @@ dummy_dag:
       retry_delay: 1200
       params:
         historical: True
-        test: 'Yes'
+        year: 2024
 
     transform:
       python_callable: transform
