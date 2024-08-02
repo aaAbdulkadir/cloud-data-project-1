@@ -39,11 +39,41 @@ def import_functions(functions_filepath: str):
 
 def load_config_if_exists(scrape_dir_path: str, dag_params: dict) -> dict:
     """Load configuration file if it exists."""
-    config = {}
     if 'config_path' in dag_params:
         config_path = os.path.join(scrape_dir_path, dag_params['config_path'])
         config = load_json_file(config_path)
+    else:
+        config = None
     return config
+
+def task_wrapper(task_function, next_task_id, **kwargs):
+    ti = kwargs['ti']
+    task_id = kwargs['task'].task_id
+    dag_id = kwargs['dag'].dag_id
+    ts = kwargs['ts']
+    file_extension = kwargs['dag'].default_args['file_extension']
+
+    output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
+
+    if task_id == 'extract':
+        url = kwargs['url']
+        logical_timestamp = kwargs['logical_timestamp']
+        config = kwargs['config']
+        # Include all kwargs from the YAML configuration
+        params = kwargs.get('params', {})
+        task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config, params=params)
+    elif task_id == 'load':
+        dataset_name = kwargs['dataset_name']
+        input_filename = kwargs['input_filename']
+        mode = kwargs['mode']
+        keyfields = kwargs['keyfields']
+        task_function(dataset_name=dataset_name, input_filename=input_filename, mode=mode, keyfields=keyfields)
+    else:
+        input_filename = kwargs['input_filename']
+        params = kwargs.get('kwargs', {})
+        task_function(input_filename=input_filename, output_filename=output_filename, params=params)
+
+    ti.xcom_push(key='output_filename', value=output_filename)
 
 def create_dag(yml_file_path: str) -> DAG:
     """Create a DAG from the configuration and functions in the specified directory."""
@@ -89,43 +119,41 @@ def create_dag(yml_file_path: str) -> DAG:
             else:
                 python_callable = getattr(functions, task_params.get('python_callable'))
 
-            task_kwargs = {
-                **task_params.get('params', {}),  
-                'config': config
-            }
+            params = {**task_params.get('params', {})}
 
             next_task_id = task_order[idx + 1] if idx + 1 < len(task_order) else ''
-            previous_task_id = task_order[idx - 1] if idx > 0 else ''
 
             if task_id == 'extract':
-                task_kwargs.update({
+                params.update({
                     'url': dag_params.get('url'),
                     'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}'),
                     'logical_timestamp': '{{ ts }}',
+                    'config': config,
                 })
             elif task_id == 'load':
-                task_kwargs.update({
+                previous_task_id = task_order[idx - 1]
+                params.update({
                     'input_filename': "{{ ti.xcom_pull(task_ids='" + previous_task_id + "', key='output_filename') }}",
                     'mode': task_params.get('mode'),
                     'dataset_name': task_params.get('dataset_name'),
                     'keyfields': task_params.get('fields'),
                 })
             else:
-                task_kwargs.update({
+                previous_task_id = task_order[idx - 1]
+                params.update({
                     'input_filename': "{{ ti.xcom_pull(task_ids='" + previous_task_id + "', key='output_filename') }}",
-                    'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}'),
+                    'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}')
                 })
-                
+
             task = PythonOperator(
                 task_id=task_id,
-                python_callable=python_callable,
-                op_kwargs=task_kwargs,
+                python_callable=task_wrapper,
+                op_kwargs={**params, 'task_function': python_callable, 'next_task_id': next_task_id},
                 retries=task_params.get('retries', 0),
                 retry_delay=timedelta(seconds=task_params.get('retry_delay', 15)),
                 provide_context=True,
                 dag=dag
             )
-
             tasks[task_id] = task
 
         for task_id, task_params in dag_params.get('tasks', {}).items():
