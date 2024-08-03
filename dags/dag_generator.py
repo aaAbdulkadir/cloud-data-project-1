@@ -62,6 +62,10 @@ def task_wrapper(task_function, next_task_id, **kwargs):
     file_extension = kwargs['dag'].default_args['file_extension']
 
     output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
+    try:
+        print(kwargs['input_filename'])
+    except:
+        print('no input_filename ')
     print('OUTPUT_FILENAME:', output_filename)
     
     directory = f"{STAGING_DATA}/{dag_id}"
@@ -90,6 +94,10 @@ def task_wrapper(task_function, next_task_id, **kwargs):
         task_function(input_filename=input_filename, output_filename=output_filename)
         
     # Upload output file to S3 staging bucket
+    try:
+        print(kwargs['input_filename'])
+    except:
+        print('no input_filename ')
     print('OUTPUT_FILENAME:', output_filename)
     upload_to_s3(local_file_path=output_filename, bucket=S3_STAGING_BUCKET, s3_key=s3_key)
     
