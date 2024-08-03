@@ -6,6 +6,7 @@ import pendulum
 import importlib
 import json
 from datetime import timedelta
+from airflow.models import Variable
 
 from airflow_to_aws import (
     upload_to_s3,
@@ -13,7 +14,7 @@ from airflow_to_aws import (
     load_to_rds,
 )
 
-S3_STAGING_BUCKET = os.getenv('S3_STAGING_BUCKET')
+S3_STAGING_BUCKET = Variable.get("S3_STAGING_BUCKET")
 AIRFLOW_HOME = '/home/ubuntu/airflow'
 STAGING_DATA = AIRFLOW_HOME + '/staging_data'
 
