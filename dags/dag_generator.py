@@ -85,6 +85,7 @@ def task_wrapper(task_function, next_task_id, **kwargs):
         task_function(input_filename=input_filename, output_filename=output_filename)
         
     # Upload output file to S3 staging bucket
+    print(S3_STAGING_BUCKET)
     upload_to_s3(local_file_path=output_filename, bucket=S3_STAGING_BUCKET, s3_key=output_filename)
     
     ti.xcom_push(key='output_filename', value=output_filename)
