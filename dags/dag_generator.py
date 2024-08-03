@@ -7,6 +7,7 @@ import importlib
 import json
 from datetime import timedelta
 from airflow.models import Variable
+import logging
 
 from airflow_to_aws import (
     upload_to_s3,
@@ -61,6 +62,7 @@ def task_wrapper(task_function, next_task_id, **kwargs):
     file_extension = kwargs['dag'].default_args['file_extension']
 
     output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
+    print('OUTPUT_FILENAME:', output_filename)
     
     directory = f"{STAGING_DATA}/{dag_id}"
     s3_key = f"{dag_id}/{os.path.basename(output_filename)}"
@@ -88,6 +90,7 @@ def task_wrapper(task_function, next_task_id, **kwargs):
         task_function(input_filename=input_filename, output_filename=output_filename)
         
     # Upload output file to S3 staging bucket
+    print('OUTPUT_FILENAME:', output_filename)
     upload_to_s3(local_file_path=output_filename, bucket=S3_STAGING_BUCKET, s3_key=s3_key)
     
     ti.xcom_push(key='output_filename', value=output_filename)
