@@ -61,7 +61,7 @@ def task_wrapper(task_function, next_task_id, **kwargs):
     file_extension = kwargs['dag'].default_args['file_extension']
 
     directory = f"{STAGING_DATA}/{dag_id}"
-    s3_key = dag_id + os.path.basename(output_filename)
+    s3_key = f"{dag_id}/{os.path.basename(output_filename)}"
     os.makedirs(directory, exist_ok=True)
     
     output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
