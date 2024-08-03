@@ -21,7 +21,7 @@ STAGING_DATA = AIRFLOW_HOME + '/staging_data'
 
 
 def get_filename_template(dag_id, task_id, next_task_id, ts, file_extension):
-    return f"{STAGING_DATA}/{dag_id}/{dag_id}_{task_id}_to_{next_task_id}_{ts}.{file_extension}"
+    return f"{dag_id}/{dag_id}_{task_id}_to_{next_task_id}_{ts}.{file_extension}"
 
 
 def load_yml_file(yml_file_path: str) -> dict:
@@ -62,44 +62,41 @@ def task_wrapper(task_function, next_task_id, **kwargs):
     file_extension = kwargs['dag'].default_args['file_extension']
 
     output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
-    try:
-        print(kwargs['input_filename'])
-    except:
-        print('no input_filename ')
+    local_output_filepath = f"{STAGING_DATA}/{output_filename}"
+
     print('OUTPUT_FILENAME:', output_filename)
+    print('LOCAL_OUTPUT_FILEPATH:', local_output_filepath)
     
     directory = f"{STAGING_DATA}/{dag_id}"
-    s3_key = f"{dag_id}/{os.path.basename(output_filename)}"
+    s3_key = output_filename
     os.makedirs(directory, exist_ok=True)
-    
     
     # pull file from s3 staging bucket
     if task_id not in ('extract', 'load'):
-        retrieve_from_s3(bucket=S3_STAGING_BUCKET, s3_key=s3_key, local_file_path=output_filename)
+        input_s3_key = ti.xcom_pull(task_ids=kwargs['prev_task_id'], key='output_filename')
+        input_local_filepath = f"{STAGING_DATA}/{input_s3_key}"
+        retrieve_from_s3(bucket=S3_STAGING_BUCKET, s3_key=input_s3_key, local_file_path=input_local_filepath)
+    else:
+        input_local_filepath = None
     
     # Main python callable 
     if task_id == 'extract':
         url = kwargs['url']
         logical_timestamp = kwargs['logical_timestamp']
         config = kwargs['config']
-        task_function(url=url, output_filename=output_filename, logical_timestamp=logical_timestamp, config=config)
+        task_function(url=url, output_filename=local_output_filepath, logical_timestamp=logical_timestamp, config=config)
     elif task_id == 'load':
         dataset_name = kwargs['dataset_name']
-        input_filename = kwargs['input_filename']
         mode = kwargs['mode']
         keyfields = kwargs['keyfields']
-        task_function(dataset_name=dataset_name, input_filename=input_filename, mode=mode, keyfields=keyfields)
+        task_function(dataset_name=dataset_name, input_filename=input_local_filepath, mode=mode, keyfields=keyfields)
     else:
-        input_filename = kwargs['input_filename']
-        task_function(input_filename=input_filename, output_filename=output_filename)
+        task_function(input_filename=input_local_filepath, output_filename=local_output_filepath)
         
     # Upload output file to S3 staging bucket
-    try:
-        print(kwargs['input_filename'])
-    except:
-        print('no input_filename ')
+    print('LOCAL_OUTPUT_FILEPATH:', local_output_filepath)
     print('OUTPUT_FILENAME:', output_filename)
-    upload_to_s3(local_file_path=output_filename, bucket=S3_STAGING_BUCKET, s3_key=s3_key)
+    upload_to_s3(local_file_path=local_output_filepath, bucket=S3_STAGING_BUCKET, s3_key=s3_key)
     
     ti.xcom_push(key='output_filename', value=output_filename)
     
@@ -151,6 +148,7 @@ def create_dag(yml_file_path: str) -> DAG:
             args = {}
 
             next_task_id = task_order[idx + 1] if idx + 1 < len(task_order) else ''
+            prev_task_id = task_order[idx - 1] if idx > 0 else None
 
             if task_id == 'extract':
                 args.update({
@@ -160,24 +158,22 @@ def create_dag(yml_file_path: str) -> DAG:
                     'config': config,
                 })
             elif task_id == 'load':
-                previous_task_id = task_order[idx - 1]
                 args.update({
-                    'input_filename': "{{ ti.xcom_pull(task_ids='" + previous_task_id + "', key='output_filename') }}",
+                    'input_filename': "{{ ti.xcom_pull(task_ids='" + prev_task_id + "', key='output_filename') }}",
                     'mode': task_params.get('mode'),
                     'dataset_name': task_params.get('dataset_name'),
                     'fields': task_params.get('fields'),
                 })
             else:
-                previous_task_id = task_order[idx - 1]
                 args.update({
-                    'input_filename': "{{ ti.xcom_pull(task_ids='" + previous_task_id + "', key='output_filename') }}",
+                    'input_filename': "{{ ti.xcom_pull(task_ids='" + prev_task_id + "', key='output_filename') }}",
                     'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}')
                 })
 
             task = PythonOperator(
                 task_id=task_id,
                 python_callable=task_wrapper,
-                op_kwargs={**args, 'task_function': python_callable, 'next_task_id': next_task_id},
+                op_kwargs={**args, 'task_function': python_callable, 'next_task_id': next_task_id, 'prev_task_id': prev_task_id},
                 retries=task_params.get('retries', 0),
                 retry_delay=timedelta(seconds=task_params.get('retry_delay', 15)),
                 provide_context=True,
