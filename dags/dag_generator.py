@@ -60,13 +60,15 @@ def task_wrapper(task_function, next_task_id, **kwargs):
     ts = kwargs['ts']
     file_extension = kwargs['dag'].default_args['file_extension']
 
-    os.makedirs(dag_id, exist_ok=True)
+    directory = f"{STAGING_DATA}/{dag_id}"
+    s3_key = dag_id + os.path.basename(output_filename)
+    os.makedirs(directory, exist_ok=True)
     
     output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
     
     # pull file from s3 staging bucket
     if task_id not in ('extract', 'load'):
-        retrieve_from_s3(bucket=S3_STAGING_BUCKET, s3_key=output_filename, local_file_path=output_filename)
+        retrieve_from_s3(bucket=S3_STAGING_BUCKET, s3_key=s3_key, local_file_path=output_filename)
     
     # Main python callable 
     if task_id == 'extract':
@@ -85,8 +87,7 @@ def task_wrapper(task_function, next_task_id, **kwargs):
         task_function(input_filename=input_filename, output_filename=output_filename)
         
     # Upload output file to S3 staging bucket
-    print(S3_STAGING_BUCKET)
-    upload_to_s3(local_file_path=output_filename, bucket=S3_STAGING_BUCKET, s3_key=output_filename)
+    upload_to_s3(local_file_path=output_filename, bucket=S3_STAGING_BUCKET, s3_key=s3_key)
     
     ti.xcom_push(key='output_filename', value=output_filename)
     
