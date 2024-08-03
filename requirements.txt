@@ -3,3 +3,4 @@ psycopg2-binary
 apache-airflow
 pytest
 boto3
+mock

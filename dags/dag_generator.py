@@ -7,7 +7,6 @@ import importlib
 import json
 from datetime import timedelta
 from airflow.models import Variable
-import logging
 
 from airflow_to_aws import (
     upload_to_s3,
@@ -15,12 +14,24 @@ from airflow_to_aws import (
     load_to_rds,
 )
 
-S3_STAGING_BUCKET = Variable.get("S3_STAGING_BUCKET")
+S3_STAGING_BUCKET = Variable.get("S3_STAGING_BUCKET", '')
 AIRFLOW_HOME = '/home/ubuntu/airflow'
 STAGING_DATA = AIRFLOW_HOME + '/staging_data'
 
 
 def get_filename_template(dag_id, task_id, next_task_id, ts, file_extension):
+    """_summary_
+
+    Args:
+        dag_id (_type_): _description_
+        task_id (_type_): _description_
+        next_task_id (_type_): _description_
+        ts (_type_): _description_
+        file_extension (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     return f"{dag_id}/{dag_id}_{task_id}_to_{next_task_id}_{ts}.{file_extension}"
 
 
@@ -63,9 +74,6 @@ def task_wrapper(task_function, next_task_id, **kwargs):
 
     output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
     local_output_filepath = f"{STAGING_DATA}/{output_filename}"
-
-    print('OUTPUT_FILENAME:', output_filename)
-    print('LOCAL_OUTPUT_FILEPATH:', local_output_filepath)
     
     directory = f"{STAGING_DATA}/{dag_id}"
     s3_key = output_filename
@@ -94,8 +102,6 @@ def task_wrapper(task_function, next_task_id, **kwargs):
         task_function(input_filename=input_local_filepath, output_filename=local_output_filepath)
         
     # Upload output file to S3 staging bucket
-    print('LOCAL_OUTPUT_FILEPATH:', local_output_filepath)
-    print('OUTPUT_FILENAME:', output_filename)
     upload_to_s3(local_file_path=local_output_filepath, bucket=S3_STAGING_BUCKET, s3_key=s3_key)
     
     ti.xcom_push(key='output_filename', value=output_filename)
@@ -116,7 +122,6 @@ def create_dag(yml_file_path: str) -> DAG:
     default_args = {
         'owner': dag_params.get('owner', 'airflow'),
         'depends_on_past': False,
-        'description': dag_params.get('description', ''),
         'email_on_failure': dag_params.get('email_on_failure', False),
         'email_on_success': dag_params.get('email_on_success', False),
         'email_on_retry': dag_params.get('email_on_retry', False),
@@ -127,6 +132,7 @@ def create_dag(yml_file_path: str) -> DAG:
     dag = DAG(
         dag_id,
         default_args=default_args,
+        description=dag_params.get('description', ''),
         schedule_interval=dag_params.get('schedule_interval'),
         start_date=dag_params.get('start_date', pendulum.now('UTC')),
         catchup=dag_params.get('catchup', False),

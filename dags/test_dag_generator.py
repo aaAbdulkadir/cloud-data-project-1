@@ -2,6 +2,10 @@ import os
 import sys
 from pathlib import Path
 import pendulum
+from airflow.models import DagBag
+from datetime import timedelta
+from airflow.operators.python_operator import PythonOperator
+import mock
 
 # Add the project root to the Python path
 project_root = Path(__file__).parents[1]
@@ -81,11 +85,53 @@ class TestDAGGenerator(TestBase):
         
         os.remove(self.dummy_dag_extract_filename)
         
-    
-
-
-    def test_create_dag(self):
-
+    @mock.patch('airflow.models.Variable.get', return_value='mock-s3-bucket')
+    def test_create_dag(self, mock_variable):
+        
+        # Create the DAG using the provided create_dag function
         dag = create_dag(self.dummy_dag_yml)
+        dag_bag = DagBag(dag_folder=self.dags_dir, include_examples=False)
+        
+        # Ensure the DAG was loaded successfully
+        self.assertIsNotNone(dag)
+        self.assertFalse(dag_bag.import_errors)
 
-        print('yes')
+        # Load the YAML configuration for comparison
+        dag_config = load_yml_file(self.dummy_dag_yml)['dummy_dag']
+
+        # Test DAG properties
+        self.assertEqual(dag.schedule_interval, dag_config['schedule_interval'])
+        self.assertEqual(dag.description, dag_config.get('description'))
+
+        # Test default args
+        default_args = dag.default_args
+        self.assertEqual(default_args['owner'], dag_config.get('owner'))
+        self.assertEqual(default_args['email'], [dag_config['email']])
+        self.assertEqual(default_args['email_on_failure'], dag_config.get('email_on_failure'))
+        self.assertEqual(default_args['email_on_retry'], dag_config.get('email_on_retry'))
+
+        # Test tasks
+        tasks = dag_config['tasks']
+        for task_id, task_config in tasks.items():
+            task = dag.get_task(task_id)
+            self.assertIsNotNone(task)
+            self.assertIsInstance(task, PythonOperator)
+
+        # Test task dependencies
+        for task_id, task_config in tasks.items():
+            task = dag.get_task(task_id)
+            for dependency in task_config.get('dependencies', []):
+                upstream_task = dag.get_task(dependency)
+                self.assertIn(upstream_task, task.upstream_list)
+
+        # Verify the number of tasks
+        self.assertEqual(len(dag.tasks), len(tasks))
+
+        # Optionally, test specific task configurations
+        extract_task = dag.get_task('extract')
+        self.assertEqual(extract_task.op_kwargs['url'], dag_config['url'])
+
+        load_task = dag.get_task('load')
+        self.assertEqual(load_task.op_kwargs['dataset_name'], tasks['load']['dataset_name'])
+        self.assertEqual(load_task.op_kwargs['mode'], tasks['load']['mode'])
+        self.assertEqual(load_task.op_kwargs['fields'], tasks['load']['fields'])
