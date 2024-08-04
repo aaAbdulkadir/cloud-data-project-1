@@ -1,5 +1,5 @@
 venv/
-.ipynb
+*.ipynb
 .pytest_cache/
 .cache/
 .ipynb_checkpoints/
