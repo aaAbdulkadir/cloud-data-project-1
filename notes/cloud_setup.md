@@ -164,7 +164,7 @@ The RDS will be used to store the final datasets.
 - Click on Edit inbound rules
 
 - Add rule 
-    - Allow Custom TCP, port 8080, My IP
+    - Allow Custom TCP, port 8080, IPv4
 
 - Save rules
 

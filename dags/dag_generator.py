@@ -132,50 +132,48 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
         mode (str): The mode (append/replace) for the load task.
         fields (list): The key fields for the load task.
     """    
-    try:
-        ti = kwargs['ti']
-        task_id = kwargs['task'].task_id
-        dag_id = kwargs['dag'].dag_id
-        ts = kwargs['ts']
-        file_extension = kwargs['dag'].default_args['file_extension']
+    ti = kwargs['ti']
+    task_id = kwargs['task'].task_id
+    dag_id = kwargs['dag'].dag_id
+    ts = kwargs['ts']
+    file_extension = kwargs['dag'].default_args['file_extension']
 
-        output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
-        local_output_filepath = f"{STAGING_DATA}/{output_filename}"
-            
-        directory = f"{STAGING_DATA}/{dag_id}"
-        s3_key = output_filename
-        os.makedirs(directory, exist_ok=True)
+    output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
+    local_output_filepath = f"{STAGING_DATA}/{output_filename}"
         
-        # Pull file from S3 staging bucket if not 'extract' or 'load' task
-        if task_id != 'extract':
-            input_s3_key = ti.xcom_pull(task_ids=kwargs['prev_task_id'], key='output_filename')
-            input_local_filepath = f"{STAGING_DATA}/{input_s3_key}"
-            retrieve_from_s3(bucket=S3_STAGING_BUCKET, s3_key=input_s3_key, local_file_path=input_local_filepath)
-        else:
-            input_local_filepath = None
+    directory = f"{STAGING_DATA}/{dag_id}"
+    s3_key = output_filename
+    os.makedirs(directory, exist_ok=True)
+    
+    # Pull file from S3 staging bucket if not 'extract' or 'load' task
+    if task_id != 'extract':
+        input_s3_key = ti.xcom_pull(task_ids=kwargs['prev_task_id'], key='output_filename')
+        input_local_filepath = f"{STAGING_DATA}/{input_s3_key}"
+        retrieve_from_s3(bucket=S3_STAGING_BUCKET, s3_key=input_s3_key, local_file_path=input_local_filepath)
+    else:
+        input_local_filepath = None
+    
+    # Main Python callable 
+    if task_id == 'extract':
+        url = kwargs['url']
+        logical_timestamp = kwargs['logical_timestamp']
+        config = kwargs['config']
+        task_function(url=url, output_filename=local_output_filepath, logical_timestamp=logical_timestamp, config=config)
+    elif task_id == 'load':
+        dataset_name = kwargs['dataset_name']
+        mode = kwargs['mode']
+        fields = kwargs['fields']
+        task_function(dataset_name=dataset_name, input_filename=input_local_filepath, mode=mode, fields=fields)
+    else:
+        task_function(input_filename=input_local_filepath, output_filename=local_output_filepath)
         
-        # Main Python callable 
-        if task_id == 'extract':
-            url = kwargs['url']
-            logical_timestamp = kwargs['logical_timestamp']
-            config = kwargs['config']
-            task_function(url=url, output_filename=local_output_filepath, logical_timestamp=logical_timestamp, config=config)
-        elif task_id == 'load':
-            dataset_name = kwargs['dataset_name']
-            mode = kwargs['mode']
-            fields = kwargs['fields']
-            task_function(dataset_name=dataset_name, input_filename=input_local_filepath, mode=mode, fields=fields)
-        else:
-            task_function(input_filename=input_local_filepath, output_filename=local_output_filepath)
-            
-        # Upload output file to S3 staging bucket
+    # Upload output file to S3 staging bucket
+    if task_id!= 'load':
         upload_to_s3(local_file_path=local_output_filepath, bucket=S3_STAGING_BUCKET, s3_key=s3_key)
+    else:
+        os.path.remove(local_output_filepath)
         
-    finally: 
-        if os.path.exists(local_output_filepath):
-            os.remove(local_output_filepath)
-            
-        ti.xcom_push(key='output_filename', value=output_filename)
+    ti.xcom_push(key='output_filename', value=output_filename)
     
 
 def create_dag(yml_file_path: str) -> DAG:
