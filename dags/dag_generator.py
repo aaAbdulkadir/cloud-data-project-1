@@ -156,25 +156,30 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
     else:
         input_local_filepath = None
     
-    # Main Python callable 
+    # Construct arguments for the task function
+    task_function_params = inspect.signature(task_function).parameters
+    task_args = {}
+    
     if task_id == 'extract':
-        url = kwargs['url']
-        config = kwargs['config']
-        
-        # Use inspect to check if logical_timestamp is a parameter of task_function
-        task_function_params = inspect.signature(task_function).parameters
+        task_args['url'] = kwargs['url']
+        task_args['output_filename'] = local_output_filepath
         if 'logical_timestamp' in task_function_params:
-            logical_timestamp = kwargs['logical_timestamp']
-            task_function(url=url, output_filename=local_output_filepath, logical_timestamp=logical_timestamp, config=config)
-        else:
-            task_function(url=url, output_filename=local_output_filepath, config=config)
+            task_args['logical_timestamp'] = kwargs['logical_timestamp']
+        if 'config' in task_function_params:
+            task_args['config'] = kwargs['config']
     elif task_id == 'load':
-        dataset_name = kwargs['dataset_name']
-        mode = kwargs['mode']
-        fields = kwargs['fields']
-        task_function(dataset_name=dataset_name, input_filename=input_local_filepath, mode=mode, fields=fields)
+        task_args['dataset_name'] = kwargs['dataset_name']
+        task_args['input_filename'] = input_local_filepath
+        task_args['mode'] = kwargs['mode']
+        task_args['fields'] = kwargs['fields']
     else:
-        task_function(input_filename=input_local_filepath, output_filename=local_output_filepath)
+        task_args['input_filename'] = input_local_filepath
+        task_args['output_filename'] = local_output_filepath
+        if 'config' in task_function_params:
+            task_args['config'] = kwargs['config']
+        
+    # Call the main Python callable with the constructed arguments
+    task_function(**task_args)
         
     # Upload output file to S3 staging bucket
     if task_id!= 'load':
