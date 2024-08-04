@@ -170,8 +170,13 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
     # Upload output file to S3 staging bucket
     if task_id!= 'load':
         upload_to_s3(local_file_path=local_output_filepath, bucket=S3_STAGING_BUCKET, s3_key=s3_key)
-    else:
-        os.remove(local_output_filepath)
+        
+    # after downloading the fiel from s3
+    if task_id != 'extract':
+        os.remove(input_local_filepath)
+        
+    # after saving file from function
+    os.remove(local_output_filepath)
         
     ti.xcom_push(key='output_filename', value=output_filename)
     
