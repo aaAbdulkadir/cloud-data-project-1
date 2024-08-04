@@ -2,12 +2,11 @@ import unittest
 from dags.dag_generator import load_yml_file
 import os
 import pandas as pd
-import psycopg2
 import sqlite3
 import logging
 from dag_generator import load_yml_file
 from datetime import datetime
-from psycopg2 import extras
+from dateutil.parser import parse as date_parse
 
 class TestBase(unittest.TestCase):
 
@@ -97,11 +96,10 @@ class TestBase(unittest.TestCase):
             connection.commit()
             
             # Validate data constraints
-            self.validate_constraints(cursor, dataset_name, fields)
+            self.validate_constraints(df, fields)
 
         except Exception as e:
-            logger.error(f"Error loading data to SQLite: {str(e)}")
-            raise
+            raise Exception(f"Error loading data to SQLite: {str(e)}")
 
         finally:
             cursor.close()
@@ -110,22 +108,59 @@ class TestBase(unittest.TestCase):
 
         logger.info('Loaded to database successfully.')
         
-    def validate_constraints(self, cursor, table_name, fields):
+    def validate_constraints(self, df, fields):
         """Validate that the data matches the constraints specified in the fields."""
         for field in fields:
             field_name = field['name']
             field_type = field['type']
+            
             if 'VARCHAR' in field_type:
                 max_length = int(field_type.strip('VARCHAR()'))
-                self.verify_varchar_length(cursor, table_name, field_name, max_length)
+                self.verify_varchar_length(df, field_name, max_length)
+            elif field_type == 'INTEGER':
+                self.verify_integer_type(df, field_name)
+            elif field_type == 'FLOAT':
+                self.verify_float_type(df, field_name)
+            elif field_type == 'DATE':
+                self.verify_date_type(df, field_name)
+            elif field_type == 'DATETIME':
+                self.verify_datetime_type(df, field_name)
+            else:
+                raise ValueError(f"Unsupported data type '{field_type}' for field '{field_name}'.")
+            # Add more type checks if needed
 
-
-    def verify_varchar_length(self, cursor, table_name, field_name, max_length):
+    def verify_varchar_length(self, df, field_name, max_length):
         """Verify VARCHAR field length constraints."""
-        logger = logging.getLogger('load_to_sqlite')
-        cursor.execute(f"SELECT {field_name} FROM {table_name}")
-        rows = cursor.fetchall()
-        for row in rows:
-            value = row[0]
-            if value and len(value) > max_length:
-                logger.error(f"Value '{value}' exceeds maximum length of {max_length} for field '{field_name}'.")
+        for value in df[field_name]:
+            if pd.notna(value) and len(str(value)) > max_length:
+                raise ValueError(f"Value '{value}' exceeds maximum length of {max_length} for field '{field_name}'.")
+
+    def verify_integer_type(self, df, field_name):
+        """Verify INTEGER type constraints."""
+        for value in df[field_name]:
+            if pd.notna(value) and not isinstance(value, int):
+                raise ValueError(f"Value '{value}' is not an integer for field '{field_name}'.")
+
+    def verify_float_type(self, df, field_name):
+        """Verify FLOAT type constraints."""
+        for value in df[field_name]:
+            if pd.notna(value) and not isinstance(value, float):
+                raise ValueError(f"Value '{value}' is not a float for field '{field_name}'.")
+
+    def verify_date_type(self, df, field_name):
+        """Verify DATE type constraints."""
+        for value in df[field_name]:
+            if pd.notna(value):
+                try:
+                    date_parse(value).date()
+                except (ValueError, TypeError):
+                    raise ValueError(f"Value '{value}' is not a valid date for field '{field_name}'.")
+
+    def verify_datetime_type(self, df, field_name):
+        """Verify DATETIME type constraints."""
+        for value in df[field_name]:
+            if pd.notna(value):
+                try:
+                    date_parse(value)
+                except (ValueError, TypeError):
+                    raise ValueError(f"Value '{value}' is not a valid datetime for field '{field_name}'.")
