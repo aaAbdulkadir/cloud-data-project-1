@@ -9,6 +9,7 @@ from datetime import timedelta
 from airflow.models import Variable
 from typing import Callable
 import logging
+import inspect
 
 from airflow_to_aws import (
     upload_to_s3,
@@ -160,8 +161,9 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
         url = kwargs['url']
         config = kwargs['config']
         
-        # Check if logical_timestamp is present in kwargs and pass accordingly
-        if 'logical_timestamp' in kwargs:
+        # Use inspect to check if logical_timestamp is a parameter of task_function
+        task_function_params = inspect.signature(task_function).parameters
+        if 'logical_timestamp' in task_function_params:
             logical_timestamp = kwargs['logical_timestamp']
             task_function(url=url, output_filename=local_output_filepath, logical_timestamp=logical_timestamp, config=config)
         else:
