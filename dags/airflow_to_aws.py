@@ -101,12 +101,12 @@ def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str)
         cursor = connection.cursor()
 
         if mode == 'append':
-            create_table_query = f"CREATE TABLE IF NOT EXISTS {dataset_name} (id SERIAL PRIMARY KEY"
+            create_table_query = f"CREATE TABLE IF NOT EXISTS {dataset_name} ("
         elif mode == 'replace':
             drop_table_query = f"DROP TABLE IF EXISTS {dataset_name};"
             cursor.execute(drop_table_query)
             connection.commit()
-            create_table_query = f"CREATE TABLE {dataset_name} (id SERIAL PRIMARY KEY"
+            create_table_query = f"CREATE TABLE {dataset_name} ("
         else:
             raise ValueError("Invalid mode. Choose 'append' or 'replace'.")
 
@@ -115,6 +115,8 @@ def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str)
             field_type = field['type']
             create_table_query += f", {field_name} {field_type}"
         create_table_query += ", scraping_execution_date timestamp);"
+        
+        logger.info(f'Running {mode} on query: {create_table_query}')
 
         cursor.execute(create_table_query)
         connection.commit()
