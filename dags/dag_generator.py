@@ -131,7 +131,9 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
         dataset_name (str): The name of the dataset for the load task.
         mode (str): The mode (append/replace) for the load task.
         fields (list): The key fields for the load task.
-    """    
+    """ 
+    logger = logging.getLogger('Task wrapper')
+    
     ti = kwargs['ti']
     task_id = kwargs['task'].task_id
     dag_id = kwargs['dag'].dag_id
@@ -173,10 +175,9 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
         
     # after downloading the fiel from s3
     if task_id != 'extract':
+        logger.info(f'Removed {input_local_filepath}')
         os.remove(input_local_filepath)
         
-    # after saving file from function
-    os.remove(local_output_filepath)
         
     ti.xcom_push(key='output_filename', value=output_filename)
     
