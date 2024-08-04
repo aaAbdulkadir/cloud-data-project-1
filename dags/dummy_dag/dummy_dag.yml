@@ -30,11 +30,9 @@ dummy_dag:
       dependencies:
         - transform
       fields:
-        - name: Date
-          type: Date
-        - name: Time
-          type: Varchar(100)
-        - name: Service 
-          type: Varchar(100)
-        - name: Time
-          type: Varchar(100)
+        - name: Column1
+          type: VARCHAR(10)
+        - name: Column2
+          type: INTEGER
+        - name: Column3 
+          type: VARCHAR(10)

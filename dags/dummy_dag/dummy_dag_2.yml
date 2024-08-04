@@ -2,7 +2,7 @@ dummy_dag_2:
   owner: Abdulkadir
   description: dummy dag 2
   schedule_interval: '0 9 * * *'
-  url: https://www.google.com
+  url: None
 
   email_on_failure: True
   email_on_retry: False
@@ -15,18 +15,18 @@ dummy_dag_2:
     extract:
       python_callable: extract_2
 
-    transform:
+    transform_different_name:
       python_callable: transform
         
     load:
       mode: append
       dataset_name: dummy_dag
+      dependencies:
+        - transform_different_name
       fields:
-        - name: Date
-          type: Date
-        - name: Time
-          type: Varchar(100)
-        - name: Service 
-          type: Varchar(100)
-        - name: Time
-          type: Varchar(100)
+        - name: Column1
+          type: VARCHAR(10)
+        - name: Column2
+          type: INTEGER
+        - name: Column3 
+          type: VARCHAR(10)

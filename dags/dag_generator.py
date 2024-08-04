@@ -7,6 +7,8 @@ import importlib
 import json
 from datetime import timedelta
 from airflow.models import Variable
+from typing import Callable
+import logging
 
 from airflow_to_aws import (
     upload_to_s3,
@@ -19,36 +21,59 @@ AIRFLOW_HOME = '/home/ubuntu/airflow'
 STAGING_DATA = AIRFLOW_HOME + '/staging_data'
 
 
-def get_filename_template(dag_id, task_id, next_task_id, ts, file_extension):
-    """_summary_
+def get_filename_template(dag_id: str, task_id: str, next_task_id: str, ts: str, file_extension: str) -> str:
+    """Gets the filename template for a given task. It formulates the filename
+    based on the current task to the next task, with its timestamp and directory.
 
     Args:
-        dag_id (_type_): _description_
-        task_id (_type_): _description_
-        next_task_id (_type_): _description_
-        ts (_type_): _description_
-        file_extension (_type_): _description_
+        dag_id (str): The ID of the DAG.
+        task_id (str): The ID of the current task.
+        next_task_id (str): The ID of the next task.
+        ts (str): The timestamp of the task run.
+        file_extension (str): The file extension of the output file.
 
     Returns:
-        _type_: _description_
+        str: The formulated filename.
     """
     return f"{dag_id}/{dag_id}_{task_id}_to_{next_task_id}_{ts}.{file_extension}"
 
 
+
 def load_yml_file(yml_file_path: str) -> dict:
-    """Load DAG configuration from a YAML file."""
+    """Loads the yml file
+
+    Args:
+        yml_file_path (str): The file path of the yml configuration file.
+
+    Returns:
+        dict: The yml file parameters.
+    """
     with open(yml_file_path, 'r') as config_file:
         return yaml.safe_load(config_file)
     
 
 def load_json_file(json_file_path: str) -> dict:
-    """Load JSON configuration file."""
+    """Loads the json file
+
+    Args:
+        json_file_path (str): The file path of the json configuration file.
+
+    Returns:
+        dict: The json file parameters.
+    """
     with open(json_file_path, 'r') as json_file:
         return json.load(json_file)
     
 
-def import_functions(functions_filepath: str):
-    """Import Python functions from the specified filepath."""
+def import_functions(functions_filepath: str) -> object:
+    """Imports functions from another Python file.
+
+    Args:
+        functions_filepath (str): The file path of the Python file containing the functions.
+
+    Returns:
+        object: The module containing the imported functions.
+    """
     spec = importlib.util.spec_from_file_location("functions_module", functions_filepath)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -56,16 +81,57 @@ def import_functions(functions_filepath: str):
 
 
 def load_config_if_exists(scrape_dir_path: str, dag_params: dict) -> dict:
-    """Load configuration file if it exists."""
+    """Load a configuration file if it exists.
+
+    This function checks if a configuration file path is specified in the `dag_params`. 
+    If the path exists, it loads the configuration from the specified JSON file.
+    If the path does not exist, it returns an empty dictionary.
+
+    Args:
+        scrape_dir_path (str): The directory path where the configuration file is located.
+        dag_params (dict): The parameters of the DAG, which may include the path to the 
+                           configuration file.
+
+    Returns:
+        dict: The loaded configuration as a dictionary. If no configuration file is found, 
+              an empty dictionary is returned.
+    """
+    logger = logging.getLogger('Load config if exists'
+                               )
     if 'config_path' in dag_params:
+        logger.info('config_path exists in yml file')
         config_path = os.path.join(scrape_dir_path, dag_params['config_path'])
         config = load_json_file(config_path)
     else:
+        logger.info('config_path does not exist in yml file')
         config = {}
     return config
 
 
-def task_wrapper(task_function, next_task_id, **kwargs):
+def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
+    """Wraps a task function to handle file staging, S3 interactions, and Airflow XCom.
+
+    This wrapper handles the file paths, pulls necessary files from S3, executes
+    the given task function, and pushes the output filename to XCom for downstream tasks.
+
+    Args:
+        task_function (Callable): The main task function to be executed.
+        next_task_id (str): The task ID of the next task in the DAG.
+        **kwargs: Additional keyword arguments passed by Airflow.
+
+    Keyword Args:
+        ti (TaskInstance): The Airflow TaskInstance object.
+        task (Task): The Airflow Task object.
+        dag (DAG): The Airflow DAG object.
+        ts (str): The timestamp of the DAG run.
+        prev_task_id (str): The task ID of the previous task in the DAG.
+        url (str): The URL to be used by the extract task.
+        logical_timestamp (str): The logical timestamp for the extract task.
+        config (dict): Configuration dictionary for the extract task.
+        dataset_name (str): The name of the dataset for the load task.
+        mode (str): The mode (append/replace) for the load task.
+        keyfields (list): The key fields for the load task.
+    """    
     ti = kwargs['ti']
     task_id = kwargs['task'].task_id
     dag_id = kwargs['dag'].dag_id
@@ -74,12 +140,12 @@ def task_wrapper(task_function, next_task_id, **kwargs):
 
     output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
     local_output_filepath = f"{STAGING_DATA}/{output_filename}"
-    
+        
     directory = f"{STAGING_DATA}/{dag_id}"
     s3_key = output_filename
     os.makedirs(directory, exist_ok=True)
     
-    # pull file from s3 staging bucket
+    # Pull file from S3 staging bucket if not 'extract' or 'load' task
     if task_id not in ('extract', 'load'):
         input_s3_key = ti.xcom_pull(task_ids=kwargs['prev_task_id'], key='output_filename')
         input_local_filepath = f"{STAGING_DATA}/{input_s3_key}"
@@ -87,7 +153,7 @@ def task_wrapper(task_function, next_task_id, **kwargs):
     else:
         input_local_filepath = None
     
-    # Main python callable 
+    # Main Python callable 
     if task_id == 'extract':
         url = kwargs['url']
         logical_timestamp = kwargs['logical_timestamp']
@@ -108,7 +174,18 @@ def task_wrapper(task_function, next_task_id, **kwargs):
     
 
 def create_dag(yml_file_path: str) -> DAG:
-    """Create a DAG from the configuration and functions in the specified directory."""
+    """Create a DAG from the configuration and functions specified in a YAML file.
+
+    This function reads the DAG configuration from a YAML file, loads the necessary
+    Python functions from a specified file, and constructs an Airflow DAG with the 
+    tasks and dependencies as defined in the YAML file.
+
+    Args:
+        yml_file_path (str): The path to the YAML file containing the DAG configuration.
+
+    Returns:
+        DAG: The constructed Airflow DAG.
+    """
     dag_id = os.path.basename(yml_file_path).split('.')[0]
     dag_params = load_yml_file(yml_file_path)[dag_id]
     scrape_dir_path = os.path.dirname(yml_file_path)

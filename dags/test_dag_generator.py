@@ -16,7 +16,8 @@ from dags.dag_generator import (
     load_json_file,
     import_functions,
     create_dag,
-    get_filename_template
+    get_filename_template,
+    load_config_if_exists
 )
 from dags.test_base import TestBase
 
@@ -44,6 +45,9 @@ class TestDAGGenerator(TestBase):
         self.dummy_dag_transform_filename = os.path.join(
             self.dummy_dag_dir, 'transform.csv'
         )
+        self.dummy_dag_config = os.path.join(
+            self.dummy_dag_dir, 'config/config.json'
+        )
         
     def test_get_filename_template(self):
         dag_id = 'example_dag'
@@ -51,8 +55,7 @@ class TestDAGGenerator(TestBase):
         next_task_id = 'task_2'
         ts = '2024-08-02T12:00:00Z'
         file_extension = 'csv'
-        STAGING_DATA = '/home/ubuntu/airflow/staging_data'
-        expected_output = f"{STAGING_DATA}/{dag_id}_{task_id}_to_{next_task_id}_{ts}.{file_extension}"
+        expected_output = f"{dag_id}/{dag_id}_{task_id}_to_{next_task_id}_{ts}.{file_extension}"
         
         result = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
         
@@ -61,7 +64,7 @@ class TestDAGGenerator(TestBase):
     def test_load_yaml_is_valid(self):
         self.validate_config(self.dummy_dag_yml)
 
-    def test_load_dag_config(self):
+    def test_load_yml_file(self):
         yml_file_path = self.dummy_dag_yml
         yml = load_yml_file(yml_file_path)
         self.assertIsNotNone(yml)
@@ -84,6 +87,14 @@ class TestDAGGenerator(TestBase):
         self.assertTrue(os.path.isfile(self.dummy_dag_extract_filename))
         
         os.remove(self.dummy_dag_extract_filename)
+        
+    def test_load_config_if_exists(self):
+        dag_parmas = {'config_path': 'config/config.json'}
+
+        config = load_config_if_exists(self.dummy_dag_dir, dag_parmas)
+        
+        assert config['foo'] == 'bar'
+    
         
     @mock.patch('airflow.models.Variable.get', return_value='mock-s3-bucket')
     def test_create_dag(self, mock_variable):
