@@ -158,9 +158,14 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
     # Main Python callable 
     if task_id == 'extract':
         url = kwargs['url']
-        logical_timestamp = kwargs['logical_timestamp']
         config = kwargs['config']
-        task_function(url=url, output_filename=local_output_filepath, logical_timestamp=logical_timestamp, config=config)
+        
+        # Check if logical_timestamp is present in kwargs and pass accordingly
+        if 'logical_timestamp' in kwargs:
+            logical_timestamp = kwargs['logical_timestamp']
+            task_function(url=url, output_filename=local_output_filepath, logical_timestamp=logical_timestamp, config=config)
+        else:
+            task_function(url=url, output_filename=local_output_filepath, config=config)
     elif task_id == 'load':
         dataset_name = kwargs['dataset_name']
         mode = kwargs['mode']

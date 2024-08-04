@@ -29,7 +29,7 @@ class TestDAGGenerator(TestBase):
             self.dags_dir, 'dummy_dag'
         )
         self.dummy_dag_yml = os.path.join(
-            self.dummy_dag_dir, 'dummy_dag.yml'
+            self.dummy_dag_dir, 'dummy_dag_2.yml'
         )
         self.json_file_path = os.path.join(
              self.dummy_dag_dir, 'config', 'config.json'
