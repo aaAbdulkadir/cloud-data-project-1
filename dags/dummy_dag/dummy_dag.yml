@@ -35,4 +35,4 @@ dummy_dag:
         - name: Column2
           type: INTEGER
         - name: Column3 
-          type: VARCHAR(10)
+          type: VARCHAR(9)

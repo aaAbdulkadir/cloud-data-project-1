@@ -1,6 +1,14 @@
 import unittest
 from dags.dag_generator import load_yml_file
 import os
+import pandas as pd
+import psycopg2
+import sqlite3
+import logging
+from dag_generator import load_yml_file
+from datetime import datetime
+from psycopg2 import extras
+
 class TestBase(unittest.TestCase):
 
     def validate_config(self, yml_file_path):
@@ -42,8 +50,82 @@ class TestBase(unittest.TestCase):
             # self.assertTrue(self.is_valid_postgres_type(field['type']), f"Invalid Postgres type: {field['type']}")
 
 
-    def validate_load(self, yml_file_path):
-        """Placeholder for load function validation."""
-        # Implement the load function validation as per your specific requirements
-        pass
+    def validate_load(self, yml_file_path, input_filename: str):
+        """Validate load function with an SQLite in-memory database."""
+        logger = logging.getLogger('load_to_sqlite')
+        
+        # Load in yml file load variables
+        dag_id = os.path.basename(yml_file_path).split('.')[0]
+        load_params = load_yml_file(yml_file_path)[dag_id]['tasks']['load']
+        mode = load_params['mode']
+        dataset_name = load_params['dataset_name']
+        fields = load_params['fields']
+        
+        df = pd.read_csv(input_filename)
+        connection = sqlite3.connect(':memory:')  # In-memory SQLite database
+        
+        try:
+            cursor = connection.cursor()
 
+            if mode == 'append':
+                create_table_query = f"CREATE TABLE IF NOT EXISTS {dataset_name} ("
+            elif mode == 'replace':
+                drop_table_query = f"DROP TABLE IF EXISTS {dataset_name};"
+                cursor.execute(drop_table_query)
+                connection.commit()
+                create_table_query = f"CREATE TABLE {dataset_name} ("
+            else:
+                raise ValueError("Invalid mode. Choose 'append' or 'replace'.")
+
+            for field in fields:
+                field_name = field['name']
+                field_type = field['type']
+                create_table_query += f"{field_name} {field_type}, "
+            create_table_query += "scraping_execution_date timestamp);"
+            
+            logger.info(f'Running {mode} on query: {create_table_query}')
+
+            cursor.execute(create_table_query)
+            connection.commit()
+
+            columns = ', '.join([field['name'] for field in fields])
+            columns += ", scraping_execution_date"
+            placeholders = ', '.join(['?' for _ in range(len(fields) + 1)])
+            insert_query = f"INSERT INTO {dataset_name} ({columns}) VALUES ({placeholders})"
+            records = [(tuple(row) + (datetime.now(),)) for row in df.to_numpy()]
+            cursor.executemany(insert_query, records)
+            connection.commit()
+            
+            # Validate data constraints
+            self.validate_constraints(cursor, dataset_name, fields)
+
+        except Exception as e:
+            logger.error(f"Error loading data to SQLite: {str(e)}")
+            raise
+
+        finally:
+            cursor.close()
+            connection.close()
+            logger.info('SQLite in-memory database instance destroyed.')
+
+        logger.info('Loaded to database successfully.')
+        
+    def validate_constraints(self, cursor, table_name, fields):
+        """Validate that the data matches the constraints specified in the fields."""
+        for field in fields:
+            field_name = field['name']
+            field_type = field['type']
+            if 'VARCHAR' in field_type:
+                max_length = int(field_type.strip('VARCHAR()'))
+                self.verify_varchar_length(cursor, table_name, field_name, max_length)
+
+
+    def verify_varchar_length(self, cursor, table_name, field_name, max_length):
+        """Verify VARCHAR field length constraints."""
+        logger = logging.getLogger('load_to_sqlite')
+        cursor.execute(f"SELECT {field_name} FROM {table_name}")
+        rows = cursor.fetchall()
+        for row in rows:
+            value = row[0]
+            if value and len(value) > max_length:
+                logger.error(f"Value '{value}' exceeds maximum length of {max_length} for field '{field_name}'.")

@@ -29,7 +29,7 @@ class TestDAGGenerator(TestBase):
             self.dags_dir, 'dummy_dag'
         )
         self.dummy_dag_yml = os.path.join(
-            self.dummy_dag_dir, 'dummy_dag_2.yml'
+            self.dummy_dag_dir, 'dummy_dag.yml'
         )
         self.json_file_path = os.path.join(
              self.dummy_dag_dir, 'config', 'config.json'
@@ -42,11 +42,11 @@ class TestDAGGenerator(TestBase):
         self.dummy_dag_extract_filename = os.path.join(
             self.dummy_dag_dir, 'extract.csv'
         )
-        self.dummy_dag_transform_filename = os.path.join(
-            self.dummy_dag_dir, 'transform.csv'
-        )
         self.dummy_dag_config = os.path.join(
             self.dummy_dag_dir, 'config/config.json'
+        )
+        self.test_dummy_transform_filename = os.path.join(
+            self.dummy_dag_dir, "test_data/test_transform_file.csv"
         )
         
     def test_get_filename_template(self):
@@ -146,3 +146,6 @@ class TestDAGGenerator(TestBase):
         self.assertEqual(load_task.op_kwargs['dataset_name'], tasks['load']['dataset_name'])
         self.assertEqual(load_task.op_kwargs['mode'], tasks['load']['mode'])
         self.assertEqual(load_task.op_kwargs['fields'], tasks['load']['fields'])
+        
+    def test_load_to_sqlite(self):
+        self.validate_load(self.dummy_dag_yml, self.test_dummy_transform_filename)
