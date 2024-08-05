@@ -4,3 +4,4 @@ apache-airflow
 pytest
 boto3
 mock
+pyarrow

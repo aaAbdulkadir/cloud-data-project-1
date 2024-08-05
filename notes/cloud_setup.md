@@ -1,14 +1,3 @@
-# MAIN
-
-- code pushed to repo
-- cicd takes repo with dags and dependencies and stores it in dags s3 (allows s3 dags history and versioning and backup)
-- cicd ssh into ec2, sync dags with running airflow
-- dags extracts and transforms data and saves in staging s3
-- dag loads staging s3 transform into rds
-- dynamically generated dags with yml
-
-
-
 # AWS Services Setup
 
 **Note**: Everything is being done with the free tier of AWS.
@@ -21,7 +10,7 @@ The first thing to do is to set up an IAM user group and user so that you can en
 
 **Permissions needed for this project**:
 
-- Read write s3
+- Read write S3
 
 - Permissions to EC2
 

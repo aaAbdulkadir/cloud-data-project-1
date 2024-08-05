@@ -167,6 +167,8 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
             task_args['logical_timestamp'] = kwargs['logical_timestamp']
         if 'config' in task_function_params:
             task_args['config'] = kwargs['config']
+        if 'params' in task_function_params:
+            task_args['params'] = kwargs['params']
     elif task_id == 'load':
         task_args['dataset_name'] = kwargs['dataset_name']
         task_args['input_filename'] = input_local_filepath
@@ -260,6 +262,7 @@ def create_dag(yml_file_path: str) -> DAG:
                     'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}'),
                     'logical_timestamp': '{{ ts }}',
                     'config': config,
+                    'params': task_params.get('params', {})
                 })
             elif task_id == 'load':
                 args.update({
@@ -277,7 +280,7 @@ def create_dag(yml_file_path: str) -> DAG:
             task = PythonOperator(
                 task_id=task_id,
                 python_callable=task_wrapper,
-                op_kwargs={**args, 'task_function': python_callable, 'next_task_id': next_task_id, 'prev_task_id': prev_task_id},
+                op_kwargs={'task_function': python_callable, 'next_task_id': next_task_id, 'prev_task_id': prev_task_id, **args,},
                 retries=task_params.get('retries', 0),
                 retry_delay=timedelta(seconds=task_params.get('retry_delay', 15)),
                 provide_context=True,

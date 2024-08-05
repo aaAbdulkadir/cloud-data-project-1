@@ -2,7 +2,7 @@ new_york_taxi:
   owner: Abdulkadir
   description: Getting new york taxi data
   schedule_interval: '0 9 * * *'
-  url: https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+  url: https://d37ci6vzurychx.cloudfront.net/trip-data/{taxi_type}_tripdata_{year}-{month}.parquet
   
   email_on_failure: True
   email_on_retry: False

@@ -29,6 +29,7 @@ def extract(
 def extract_2(
     url: str,
     output_filename: str,
+    params: dict
 ) -> None:
     """Dummy extract for testing purposes.
 
@@ -40,6 +41,7 @@ def extract_2(
 
     logger.info(url)
     logger.info(output_filename)
+    logger.info(params)
 
     with open(output_filename, 'w') as f:
         f.write('Testing,1,animal')

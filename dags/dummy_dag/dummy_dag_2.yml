@@ -14,6 +14,8 @@ dummy_dag_2:
   tasks:
     extract:
       python_callable: extract_2
+      params:
+        historical: True
 
     transform_different_name:
       python_callable: extract
