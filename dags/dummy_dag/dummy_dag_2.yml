@@ -18,7 +18,9 @@ dummy_dag_2:
         historical: True
 
     transform_different_name:
-      python_callable: extract
+      python_callable: transform
+      dependencies:
+      - extract
         
     load:
       mode: append
