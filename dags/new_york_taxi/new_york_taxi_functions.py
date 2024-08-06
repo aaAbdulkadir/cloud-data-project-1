@@ -14,7 +14,9 @@ def extract(
     
     logger = logging.getLogger('extract')
     
-    logger.info('Formulating URL for ')
+    taxi_type = config['taxi_type']
+    logger.info(f'Formulating URL for {taxi_type}')
+    url = formulate_url(url, taxi_type, logical_timestamp)
     
     logger.info(f"Fetching data from {url}")
     response_content = get_response_data(url)
@@ -22,9 +24,6 @@ def extract(
     logger.info(f"Writing data to {output_filename}")
     with open(output_filename, 'w') as f:
         f.write(response_content)
-    
-    
-    
     
     
     

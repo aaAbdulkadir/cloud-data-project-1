@@ -14,6 +14,7 @@ def formulate_url(url: str, taxi_type: str, logical_timestamp: str) -> str:
     """
     year = logical_timestamp.year
     month = logical_timestamp.month
+    month = f"{month:02d}"  # pad with leading zero if single digit    
     
     return url.format(taxi_type=taxi_type, year=year, month=month)
     

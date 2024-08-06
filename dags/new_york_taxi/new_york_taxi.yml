@@ -13,13 +13,29 @@ new_york_taxi:
   config_path: config/config.json
   
   tasks:
-    extract:
+    extract_yellow: &extract
       python_callable: extract
+      params:
+        - taxi_type: yellow
 
-    transform:
+    extract_green:
+      <<: *extract
+      params:
+        - taxi_type: green
+
+
+    transform_yellow: &transform
       python_callable: transform
+      dependencies:
+        - extract_yellow
+
+    transform_green:
+      << : *transform
+      dependencies:
+        - extract_green
         
-    load:
+        
+    load_yellow: &load
       mode: append
       dataset_name: new_york_taxi
       fields:
@@ -31,3 +47,11 @@ new_york_taxi:
           type: Varchar(100)
         - name: Time
           type: Varchar(100)
+      dependencies:
+        - transform_yellow
+
+    load_green:
+      <<: *load
+      dependencies:
+        - transform_green
+
