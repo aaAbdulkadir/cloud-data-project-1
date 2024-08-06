@@ -5,9 +5,8 @@ def extract(
     config: dict
 ) -> None:
     import logging
-    import requests
     
-    from new_york_taxi_helper_functions import (
+    from new_york_taxi.new_york_taxi_helper_functions import (
         formulate_url,
         get_response_data
     )
