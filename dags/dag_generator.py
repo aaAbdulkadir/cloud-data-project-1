@@ -169,7 +169,7 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
             task_args['config'] = kwargs['config']
         if 'params' in task_function_params:
             task_args['params'] = kwargs['params']
-    if 'load' in task_id:
+    elif 'load' in task_id:
         task_args['dataset_name'] = kwargs['dataset_name']
         task_args['input_filename'] = input_local_filepath
         task_args['mode'] = kwargs['mode']
