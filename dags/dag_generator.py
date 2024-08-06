@@ -10,7 +10,6 @@ from airflow.models import Variable
 from typing import Callable
 import logging
 import inspect
-import re
 
 from airflow_to_aws import (
     upload_to_s3,
@@ -149,8 +148,8 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
     s3_key = output_filename
     os.makedirs(directory, exist_ok=True)
     
-    # Pull file from S3 staging bucket if not 'extract' or 'load' task
-    if not re.search('extract', task_id):
+    # Pull file from S3 staging bucket if not 'extract' task
+    if 'extract' not in task_id:
         input_s3_key = ti.xcom_pull(task_ids=kwargs['prev_task_id'], key='output_filename')
         input_local_filepath = f"{STAGING_DATA}/{input_s3_key}"
         retrieve_from_s3(bucket=S3_STAGING_BUCKET, s3_key=input_s3_key, local_file_path=input_local_filepath)
@@ -161,7 +160,7 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
     task_function_params = inspect.signature(task_function).parameters
     task_args = {}
     
-    if re.search('extract', task_id):
+    if 'extract' in task_id:
         task_args['url'] = kwargs['url']
         task_args['output_filename'] = local_output_filepath
         if 'logical_timestamp' in task_function_params:
@@ -170,7 +169,7 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
             task_args['config'] = kwargs['config']
         if 'params' in task_function_params:
             task_args['params'] = kwargs['params']
-    if re.search('load', task_id):
+    if 'load' in task_id:
         task_args['dataset_name'] = kwargs['dataset_name']
         task_args['input_filename'] = input_local_filepath
         task_args['mode'] = kwargs['mode']
@@ -185,11 +184,11 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
     task_function(**task_args)
         
     # Upload output file to S3 staging bucket
-    if not re.search('load', task_id):
+    if 'load' not in task_id:
         upload_to_s3(local_file_path=local_output_filepath, bucket=S3_STAGING_BUCKET, s3_key=s3_key)
         
     # after downloading the fiel from s3
-    if not re.search('extract', task_id):
+    if 'extract' not in task_id:
         logger.info(f'Removed {input_local_filepath}')
         os.remove(input_local_filepath)
         
@@ -247,7 +246,7 @@ def create_dag(yml_file_path: str) -> DAG:
         for idx, task_id in enumerate(task_order):
             task_params = dag_params['tasks'][task_id]
 
-            if re.search('load', task_id):
+            if 'load' in task_id:
                 python_callable = load_to_rds
             else:
                 python_callable = getattr(functions, task_params.get('python_callable'))
@@ -257,7 +256,7 @@ def create_dag(yml_file_path: str) -> DAG:
             next_task_id = task_order[idx + 1] if idx + 1 < len(task_order) else ''
             prev_task_id = task_order[idx - 1] if idx > 0 else None
 
-            if re.search('extract', task_id):
+            if 'extract' in task_id:
                 args.update({
                     'url': dag_params.get('url'),
                     'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}'),
@@ -265,7 +264,7 @@ def create_dag(yml_file_path: str) -> DAG:
                     'config': config,
                     'params': task_params.get('params', {})
                 })
-            elif re.search('load', task_id):
+            elif 'load' in task_id:
                 args.update({
                     'input_filename': "{{ ti.xcom_pull(task_ids='" + prev_task_id + "', key='output_filename') }}",
                     'mode': task_params.get('mode'),
