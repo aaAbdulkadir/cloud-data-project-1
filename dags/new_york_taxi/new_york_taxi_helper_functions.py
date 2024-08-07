@@ -34,7 +34,6 @@ def get_response_data(url: str) -> dict:
         return response.content
     else:
         raise AirflowException(
-            f"Failed to fetch data from {url}. 
-            Status code: {response.status_code}"
+            f"Failed to fetch data from {url}. Status code: {response.status_code}"
         )
     
