@@ -16,25 +16,25 @@ new_york_taxi:
     extract_yellow: &extract
       python_callable: extract
       params:
-        - taxi_type: yellow
+        taxi_type: yellow
 
     extract_green:
       <<: *extract
       params:
-        - taxi_type: green
+        taxi_type: green
 
 
     transform_yellow: &transform
       python_callable: transform
       params:
-        - taxi_type: yellow
+        taxi_type: yellow
       dependencies:
         - extract_yellow
 
     transform_green:
       << : *transform
       params:
-        - taxi_type: green
+        taxi_type: green
       dependencies:
         - extract_green
         
