@@ -18,6 +18,9 @@ dummy_dag:
       file_extension: csv
       retries: 3
       retry_delay: 1200
+      params:
+        - historical: True
+        - mode: delta
 
     transform:
       python_callable: transform

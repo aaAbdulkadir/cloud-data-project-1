@@ -168,7 +168,7 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
         if 'config' in task_function_params:
             task_args['config'] = kwargs['config']
         if 'params' in task_function_params:
-            task_args['params'] = kwargs['params']
+            task_args['params'] = {**{k: v for d in kwargs['params'] for k, v in d.items()}}
     elif 'load' in task_id:
         task_args['dataset_name'] = kwargs['dataset_name']
         task_args['input_filename'] = input_local_filepath
@@ -180,7 +180,7 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
         if 'config' in task_function_params:
             task_args['config'] = kwargs['config']
         if 'params' in task_function_params:
-            task_args['params'] = kwargs['params']
+            task_args['params'] = {**{k: v for d in kwargs['params'] for k, v in d.items()}}
         
     # Call the main Python callable with the constructed arguments
     task_function(**task_args)
