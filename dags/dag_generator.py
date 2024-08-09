@@ -139,6 +139,7 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
     task_id = kwargs['task'].task_id
     dag_id = kwargs['dag'].dag_id
     ts = kwargs['ts']
+    ts = pendulum.parse(ts)
     file_extension = kwargs['dag'].default_args['file_extension']
 
     output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
