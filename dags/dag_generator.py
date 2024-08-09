@@ -164,7 +164,7 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
         task_args['url'] = kwargs['url']
         task_args['output_filename'] = local_output_filepath
         if 'logical_timestamp' in task_function_params:
-            task_args['logical_timestamp'] = kwargs['logical_timestamp']
+            task_args['logical_timestamp'] = pendulum.parse(kwargs['logical_timestamp'])
         if 'config' in task_function_params:
             task_args['config'] = kwargs['config']
         if 'params' in task_function_params:
@@ -262,7 +262,7 @@ def create_dag(yml_file_path: str) -> DAG:
                 args.update({
                     'url': dag_params.get('url'),
                     'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}'),
-                    'logical_timestamp': pendulum.parse('{{ ts }}'),
+                    'logical_timestamp': '{{ ts }}',
                     'config': config,
                     'params': task_params.get('params', {})
                 })
