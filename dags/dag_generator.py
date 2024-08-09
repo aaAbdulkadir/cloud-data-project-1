@@ -164,7 +164,7 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
         task_args['url'] = kwargs['url']
         task_args['output_filename'] = local_output_filepath
         if 'logical_timestamp' in task_function_params:
-            task_args['logical_timestamp'] = kwargs['logical_timestamp']
+            task_args['logical_timestamp'] = pendulum.parse(kwargs['ts'])
         if 'config' in task_function_params:
             task_args['config'] = kwargs['config']
         if 'params' in task_function_params:
