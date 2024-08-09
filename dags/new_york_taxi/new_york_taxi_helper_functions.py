@@ -1,5 +1,5 @@
 import requests
-from airflow.exceptions import AirflowException
+from airflow.exceptions import AirflowException, AirflowSkipException
 import polars as pl
 
 def formulate_url(url: str, taxi_type: str, logical_timestamp: str) -> str:
@@ -33,6 +33,11 @@ def get_response_data(url: str) -> dict:
     
     if response.status_code == 200:
         return response.content
+    elif response.status_code == 403:
+        raise AirflowSkipException(
+            f"Failed to fetch data from {url}. Status code: {response.status_code}"
+            "URL may not be available yet, skipping."
+        )
     else:
         raise AirflowException(
             f"Failed to fetch data from {url}. Status code: {response.status_code}"
