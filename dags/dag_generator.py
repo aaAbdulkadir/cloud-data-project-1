@@ -139,7 +139,7 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
     task_id = kwargs['task'].task_id
     dag_id = kwargs['dag'].dag_id
     ts = kwargs['ts']
-    file_extension = kwargs['dag'].default_args['file_extension']
+    file_extension = kwargs['file_extension']
 
     output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
     local_output_filepath = f"{STAGING_DATA}/{output_filename}"
@@ -228,7 +228,6 @@ def create_dag(yml_file_path: str) -> DAG:
         'email_on_success': dag_params.get('email_on_success', False),
         'email_on_retry': dag_params.get('email_on_retry', False),
         'email': [dag_params.get('email')],
-        'file_extension': dag_params.get('tasks', {}).get('extract', {}).get('file_extension', 'csv')
     }
 
     dag = DAG(
@@ -252,6 +251,11 @@ def create_dag(yml_file_path: str) -> DAG:
                 python_callable = load_to_rds
             else:
                 python_callable = getattr(functions, task_params.get('python_callable'))
+                
+            if 'extract' in task_id:
+                file_extension = task_params.get('file_extension', 'csv')
+            else:
+                file_extension = 'csv'
 
             args = {}
 
@@ -261,10 +265,11 @@ def create_dag(yml_file_path: str) -> DAG:
             if 'extract' in task_id:
                 args.update({
                     'url': dag_params.get('url'),
-                    'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}'),
+                    'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', file_extension),
                     'logical_timestamp': '{{ ts }}',
                     'config': config,
-                    'params': task_params.get('params', {})
+                    'params': task_params.get('params', {}),
+                    'file_extension': file_extension,
                 })
             elif 'load' in task_id:
                 args.update({
@@ -276,9 +281,10 @@ def create_dag(yml_file_path: str) -> DAG:
             else:
                 args.update({
                     'input_filename': "{{ ti.xcom_pull(task_ids='" + prev_task_id + "', key='output_filename') }}",
-                    'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}'),
+                    'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', file_extension),
                     'config': config,
-                    'params': task_params.get('params', {})
+                    'params': task_params.get('params', {}),
+                    'file_extension': file_extension,
                 })
 
             task = PythonOperator(
