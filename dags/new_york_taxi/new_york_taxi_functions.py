@@ -14,6 +14,7 @@ def extract(
     logger = logging.getLogger('extract')
     
     logger.info(f'LOGICAL TIMESTAMP: {logical_timestamp}')
+    logger.info(f'LOGICAL TIMESTAMP DTYPE: {type(logical_timestamp)}')
         
     taxi_type = params['taxi_type']
     logger.info(f'Formulating URL for {taxi_type}')

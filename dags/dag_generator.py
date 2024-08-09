@@ -139,7 +139,6 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
     task_id = kwargs['task'].task_id
     dag_id = kwargs['dag'].dag_id
     ts = kwargs['ts']
-    ts = pendulum.parse(ts)
     file_extension = kwargs['dag'].default_args['file_extension']
 
     output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
@@ -263,7 +262,7 @@ def create_dag(yml_file_path: str) -> DAG:
                 args.update({
                     'url': dag_params.get('url'),
                     'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}'),
-                    'logical_timestamp': '{{ ts }}',
+                    'logical_timestamp': pendulum.parse('{{ ts }}'),
                     'config': config,
                     'params': task_params.get('params', {})
                 })
