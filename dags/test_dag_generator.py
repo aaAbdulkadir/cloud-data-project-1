@@ -11,7 +11,7 @@ import mock
 project_root = Path(__file__).parents[1]
 sys.path.append(str(project_root))
 
-from dags.dag_generator import (
+from dag_generator import (
     load_yml_file,
     load_json_file,
     import_functions,
@@ -19,7 +19,7 @@ from dags.dag_generator import (
     get_filename_template,
     load_config_if_exists
 )
-from dags.test_base import TestBase
+from test_base import TestBase
 
 class TestDAGGenerator(TestBase):
     def setUp(self):

@@ -5,3 +5,4 @@ pytest
 boto3
 mock
 pyarrow
+polars

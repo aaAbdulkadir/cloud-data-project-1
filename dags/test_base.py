@@ -1,5 +1,5 @@
 import unittest
-from dags.dag_generator import load_yml_file
+from dag_generator import load_yml_file
 import os
 import pandas as pd
 import sqlite3
@@ -49,13 +49,13 @@ class TestBase(unittest.TestCase):
             # self.assertTrue(self.is_valid_postgres_type(field['type']), f"Invalid Postgres type: {field['type']}")
 
 
-    def validate_load(self, yml_file_path, input_filename: str):
+    def validate_load(self, yml_file_path, input_filename: str, load_task_name: str):
         """Validate load function with an SQLite in-memory database."""
         logger = logging.getLogger('load_to_sqlite')
         
         # Load in yml file load variables
         dag_id = os.path.basename(yml_file_path).split('.')[0]
-        load_params = load_yml_file(yml_file_path)[dag_id]['tasks']['load']
+        load_params = load_yml_file(yml_file_path)[dag_id]['tasks'][load_task_name]
         mode = load_params['mode']
         dataset_name = load_params['dataset_name']
         fields = load_params['fields']

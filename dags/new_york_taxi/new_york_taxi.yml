@@ -26,11 +26,15 @@ new_york_taxi:
 
     transform_yellow: &transform
       python_callable: transform
+      params:
+        - taxi_type: yellow
       dependencies:
         - extract_yellow
 
     transform_green:
       << : *transform
+      params:
+        - taxi_type: green
       dependencies:
         - extract_green
         
@@ -39,14 +43,50 @@ new_york_taxi:
       mode: append
       dataset_name: new_york_taxi
       fields:
-        - name: Date
-          type: Date
-        - name: Time
-          type: Varchar(100)
-        - name: Service 
-          type: Varchar(100)
-        - name: Time
-          type: Varchar(100)
+        - name: vendor_id
+          type: INTEGER
+        - name: pickup_datetime
+          type: DATETIME
+        - name: dropoff_datetime 
+          type: DATETIME
+        - name: store_and_fwd_flag
+          type: VARCHAR(5)
+        - name: ratecode_id
+          type: VARCHAR(40)
+        - name: passenger_count
+          type: INTEGER
+        - name: trip_distance
+          type: FLOAT
+        - name: fare_amount
+          type: FLOAT
+        - name: extra
+          type: FLOAT
+        - name: mta_tax 
+          type: FLOAT
+        - name: tip_amount
+          type: FLOAT
+        - name: tolls_amount
+          type: FLOAT
+        - name: ehail_fee
+          type: FLOAT
+        - name: improvement_surcharge
+          type: FLOAT
+        - name: total_amount
+          type: FLOAT
+        - name: payment_type
+          type: VARCHAR(40)
+        - name: trip_type
+          type: VARCHAR(40)
+        - name: congestion_surcharge
+          type: FLOAT
+        - name: airport_fee
+          type: FLOAT
+        - name: borough
+          type: VARCHAR(40)
+        - name: zone
+          type: VARCHAR(70)
+        - name: service_zone
+          type: VARCHAR(40)
       dependencies:
         - transform_yellow
 

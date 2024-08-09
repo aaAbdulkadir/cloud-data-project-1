@@ -1,5 +1,6 @@
 import requests
 from airflow.exceptions import AirflowException
+import polars as pl
 
 def formulate_url(url: str, taxi_type: str, logical_timestamp: str) -> str:
     """_summary_
@@ -37,3 +38,31 @@ def get_response_data(url: str) -> dict:
             f"Failed to fetch data from {url}. Status code: {response.status_code}"
         )
     
+    
+def join_taxi_zone_data(df: pl.DataFrame, taxi_zone_lookup_df: pl.DataFrame) -> pl.DataFrame:
+    """_summary_
+
+    Args:
+        df (pl.DataFrame): _description_
+        taxi_zone_lookup_df (pl.DataFrame): _description_
+
+    Returns:
+        pl.DataFrame: _description_
+    """
+    pickup_dropoff_col_numbers = None
+    if len(df['pickup_location_id'].unique()) > len(df['dropoff_location_id'].unique()):
+        pickup_dropoff_col_numbers = 'pickup_location_id'
+    else:
+        pickup_dropoff_col_numbers = 'dropoff_location_id'
+        
+    taxi_zone_lookup_df = taxi_zone_lookup_df.with_columns(pl.col("location_id").cast(pl.Int32))
+    
+    df = df.join(
+        taxi_zone_lookup_df, 
+        left_on=pickup_dropoff_col_numbers, 
+        right_on='location_id', 
+        how='left'
+    )
+    df = df.drop(['pickup_location_id', 'dropoff_location_id'])
+    
+    return df

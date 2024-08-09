@@ -179,6 +179,8 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
         task_args['output_filename'] = local_output_filepath
         if 'config' in task_function_params:
             task_args['config'] = kwargs['config']
+        if 'params' in task_function_params:
+            task_args['params'] = kwargs['params']
         
     # Call the main Python callable with the constructed arguments
     task_function(**task_args)
@@ -274,7 +276,9 @@ def create_dag(yml_file_path: str) -> DAG:
             else:
                 args.update({
                     'input_filename': "{{ ti.xcom_pull(task_ids='" + prev_task_id + "', key='output_filename') }}",
-                    'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}')
+                    'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', '{{ dag.default_args.file_extension }}'),
+                    'config': config,
+                    'params': task_params.get('params', {})
                 })
 
             task = PythonOperator(
