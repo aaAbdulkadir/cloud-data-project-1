@@ -19,7 +19,6 @@ dummy_dag:
       retries: 3
       retry_delay: 1200
       params:
-        - historical: True
         - mode: delta
 
     transform:
