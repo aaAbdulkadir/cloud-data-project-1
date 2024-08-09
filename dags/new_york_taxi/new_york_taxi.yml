@@ -16,6 +16,7 @@ new_york_taxi:
   tasks:
     extract_yellow: &extract
       python_callable: extract
+      file_extension: parquet
       params:
         taxi_type: yellow
 
