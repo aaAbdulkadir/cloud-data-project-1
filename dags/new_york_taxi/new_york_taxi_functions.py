@@ -13,6 +13,8 @@ def extract(
     
     logger = logging.getLogger('extract')
     
+    logger.info(f'PARAMS: {params}')
+    
     taxi_type = params['taxi_type']
     logger.info(f'Formulating URL for {taxi_type}')
     url = formulate_url(url, taxi_type, logical_timestamp)
