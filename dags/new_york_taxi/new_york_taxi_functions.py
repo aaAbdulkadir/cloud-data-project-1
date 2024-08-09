@@ -34,7 +34,7 @@ def transform(input_filename: str, output_filename: str, config: dict, params: d
     import polars as pl
     import os
     
-    from new_york_taxi_helper_functions import join_taxi_zone_data
+    from new_york_taxi.new_york_taxi_helper_functions import join_taxi_zone_data
     
     logger = logging.getLogger('transform')
     
