@@ -411,6 +411,10 @@ sudo systemctl status airflow-webserver
 sudo systemctl status airflow-scheduler
 ```
 
+### Trigger DAG w/config
+
+- To ensure this variable is available when trying to run dags with a config or at a different timestamp, ensure 
+`show_trigger_form_if_no_params = False` is set to `True` in the airflow.cfg file.
 
 
 
