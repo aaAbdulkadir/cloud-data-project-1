@@ -275,6 +275,7 @@ def create_dag(yml_file_path: str) -> DAG:
                     'mode': task_params.get('mode'),
                     'dataset_name': task_params.get('dataset_name'),
                     'fields': task_params.get('fields'),
+                    'file_extension': file_extension,
                 })
             else:
                 args.update({
