@@ -69,6 +69,9 @@ def transform(input_filename: str, output_filename: str, config: dict, params: d
     logger.info('Joining pickup and dropoff location id to its categorical values')
     df = join_taxi_zone_data(df, taxi_zone_lookup_df)
     
+    logger.info('Adding taxi type column')
+    df = df.with_columns(taxi_type = pl.lit(taxi_type))
+    
     logger.info('Saving dataframe to csv')
     df.write_csv(output_filename)
     

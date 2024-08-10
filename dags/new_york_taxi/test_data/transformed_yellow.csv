@@ -1,101 +1,101 @@
-vendor_id,pickup_datetime,dropoff_datetime,passenger_count,trip_distance,ratecode_id,store_and_fwd_flag,payment_type,fare_amount,extra,mta_tax,tip_amount,tolls_amount,improvement_surcharge,total_amount,congestion_surcharge,airport_fee,ehail_fee,trip_type,borough,zone,service_zone
-2,2024-01-01T00:57:55.000000000,2024-01-01T01:17:43.000000000,1,1.72,Standard rate,N,Cash,17.7,1.0,0.5,0.0,0.0,1.0,22.7,2.5,0.0,NaN,NaN,Manhattan,East Village,Yellow Zone
-1,2024-01-01T00:03:00.000000000,2024-01-01T00:09:36.000000000,1,1.8,Standard rate,N,Credit card,10.0,3.5,0.5,3.75,0.0,1.0,18.75,2.5,0.0,NaN,NaN,Manhattan,Upper East Side North,Yellow Zone
-1,2024-01-01T00:17:06.000000000,2024-01-01T00:35:01.000000000,1,4.7,Standard rate,N,Credit card,23.3,3.5,0.5,3.0,0.0,1.0,31.3,2.5,0.0,NaN,NaN,Manhattan,East Village,Yellow Zone
-1,2024-01-01T00:36:38.000000000,2024-01-01T00:44:56.000000000,1,1.4,Standard rate,N,Credit card,10.0,3.5,0.5,2.0,0.0,1.0,17.0,2.5,0.0,NaN,NaN,Manhattan,SoHo,Yellow Zone
-1,2024-01-01T00:46:51.000000000,2024-01-01T00:52:57.000000000,1,0.8,Standard rate,N,Credit card,7.9,3.5,0.5,3.2,0.0,1.0,16.1,2.5,0.0,NaN,NaN,Manhattan,Lower East Side,Yellow Zone
-1,2024-01-01T00:54:08.000000000,2024-01-01T01:26:31.000000000,1,4.7,Standard rate,N,Credit card,29.6,3.5,0.5,6.9,0.0,1.0,41.5,2.5,0.0,NaN,NaN,Manhattan,Lenox Hill West,Yellow Zone
-2,2024-01-01T00:49:44.000000000,2024-01-01T01:15:47.000000000,2,10.82,Standard rate,N,Credit card,45.7,6.0,0.5,10.0,0.0,1.0,64.95,0.0,1.75,NaN,NaN,Brooklyn,Park Slope,Boro Zone
-1,2024-01-01T00:30:40.000000000,2024-01-01T00:58:40.000000000,0,3.0,Standard rate,N,Cash,25.4,3.5,0.5,0.0,0.0,1.0,30.4,2.5,0.0,NaN,NaN,Manhattan,TriBeCa/Civic Center,Yellow Zone
-2,2024-01-01T00:26:01.000000000,2024-01-01T00:54:12.000000000,1,5.44,Standard rate,N,Cash,31.0,1.0,0.5,0.0,0.0,1.0,36.0,2.5,0.0,NaN,NaN,Manhattan,World Trade Center,Yellow Zone
-2,2024-01-01T00:28:08.000000000,2024-01-01T00:29:16.000000000,1,0.04,Standard rate,N,Cash,3.0,1.0,0.5,0.0,0.0,1.0,8.0,2.5,0.0,NaN,NaN,Manhattan,Greenwich Village North,Yellow Zone
-2,2024-01-01T00:35:22.000000000,2024-01-01T00:41:41.000000000,2,0.75,Standard rate,N,Credit card,7.9,1.0,0.5,0.0,0.0,1.0,12.9,2.5,0.0,NaN,NaN,Manhattan,Kips Bay,Yellow Zone
-1,2024-01-01T00:25:00.000000000,2024-01-01T00:34:03.000000000,2,1.2,Standard rate,N,Credit card,14.9,3.5,0.5,3.95,0.0,1.0,23.85,2.5,0.0,NaN,NaN,Manhattan,West Chelsea/Hudson Yards,Yellow Zone
-1,2024-01-01T00:35:16.000000000,2024-01-01T01:11:52.000000000,2,8.2,Standard rate,N,Credit card,59.0,3.5,0.5,14.15,6.94,1.0,85.09,2.5,0.0,NaN,NaN,Brooklyn,Prospect Park,Boro Zone
-1,2024-01-01T00:43:27.000000000,2024-01-01T00:47:11.000000000,2,0.4,Standard rate,N,Credit card,5.8,3.5,0.5,1.25,0.0,1.0,12.05,2.5,0.0,NaN,NaN,Manhattan,Flatiron,Yellow Zone
-1,2024-01-01T00:51:53.000000000,2024-01-01T00:55:43.000000000,1,0.8,Standard rate,N,Cash,6.5,3.5,0.5,0.0,0.0,1.0,11.5,2.5,0.0,NaN,NaN,Manhattan,East Chelsea,Yellow Zone
-1,2024-01-01T00:50:09.000000000,2024-01-01T01:03:57.000000000,1,5.0,Standard rate,N,Cash,21.2,2.75,0.5,0.0,0.0,1.0,25.45,0.0,1.75,NaN,NaN,Queens,South Ozone Park,Boro Zone
-1,2024-01-01T00:41:06.000000000,2024-01-01T00:53:42.000000000,1,1.5,Standard rate,N,Credit card,12.8,3.5,0.5,4.45,0.0,1.0,22.25,2.5,0.0,NaN,NaN,Manhattan,East Village,Yellow Zone
-2,2024-01-01T00:52:09.000000000,2024-01-01T00:52:28.000000000,1,0.0,Standard rate,N,Cash,3.0,1.0,0.5,0.0,0.0,1.0,8.0,2.5,0.0,NaN,NaN,Manhattan,Upper East Side South,Yellow Zone
-2,2024-01-01T00:56:38.000000000,2024-01-01T01:03:17.000000000,1,1.5,Standard rate,N,Credit card,9.3,1.0,0.5,3.0,0.0,1.0,17.3,2.5,0.0,NaN,NaN,Manhattan,Yorkville West,Yellow Zone
-2,2024-01-01T00:32:34.000000000,2024-01-01T00:49:33.000000000,1,2.57,Standard rate,N,Credit card,17.7,1.0,0.5,10.0,0.0,1.0,32.7,2.5,0.0,NaN,NaN,Manhattan,Yorkville West,Yellow Zone
-2,2024-01-01T00:52:30.000000000,2024-01-01T00:57:37.000000000,1,0.66,Standard rate,N,Credit card,6.5,1.0,0.5,2.88,0.0,1.0,14.38,2.5,0.0,NaN,NaN,Manhattan,Upper East Side North,Yellow Zone
-1,2024-01-01T00:36:30.000000000,2024-01-01T01:13:53.000000000,2,1.7,Standard rate,N,Credit card,29.6,3.5,0.5,6.9,0.0,1.0,41.5,2.5,0.0,NaN,NaN,Manhattan,Murray Hill,Yellow Zone
-2,2024-01-01T00:44:24.000000000,2024-01-01T00:51:57.000000000,1,0.94,Standard rate,N,Credit card,8.6,1.0,0.5,2.72,0.0,1.0,16.32,2.5,0.0,NaN,NaN,Manhattan,Greenwich Village North,Yellow Zone
-1,2024-01-01T00:14:29.000000000,2024-01-01T00:14:29.000000000,1,0.0,Standard rate,N,Cash,3.0,3.5,0.5,0.0,0.0,1.0,8.0,2.5,0.0,NaN,NaN,Unknown,N/A,N/A
-1,2024-01-01T00:42:05.000000000,2024-01-01T01:16:49.000000000,1,23.9,Negotiated fare,N,Credit card,120.0,0.0,0.0,0.0,6.94,1.0,127.94,0.0,0.0,NaN,NaN,N/A,Outside of NYC,N/A
-2,2024-01-01T00:12:35.000000000,2024-01-01T00:19:21.000000000,2,1.08,Standard rate,N,Credit card,8.6,1.0,0.5,2.72,0.0,1.0,16.32,2.5,0.0,NaN,NaN,Manhattan,Alphabet City,Yellow Zone
-2,2024-01-01T00:20:11.000000000,2024-01-01T00:42:53.000000000,1,5.88,Standard rate,N,Credit card,28.9,1.0,0.5,2.5,0.0,1.0,36.4,2.5,0.0,NaN,NaN,Manhattan,Upper West Side North,Yellow Zone
-2,2024-01-01T00:44:01.000000000,2024-01-01T00:54:31.000000000,2,2.22,Standard rate,N,Credit card,13.5,1.0,0.5,0.0,0.0,1.0,18.5,2.5,0.0,NaN,NaN,Manhattan,Clinton West,Yellow Zone
-1,2024-01-01T00:08:12.000000000,2024-01-01T00:41:08.000000000,1,5.1,Standard rate,N,Cash,28.9,3.5,0.5,0.0,0.0,1.0,33.9,2.5,0.0,NaN,NaN,Manhattan,Greenwich Village South,Yellow Zone
-2,2024-01-01T00:36:25.000000000,2024-01-01T00:47:26.000000000,2,2.09,Standard rate,N,Credit card,12.8,1.0,0.5,3.56,0.0,1.0,21.36,2.5,0.0,NaN,NaN,Manhattan,East Village,Yellow Zone
-2,2024-01-01T00:49:31.000000000,2024-01-01T01:35:41.000000000,2,8.89,Standard rate,N,Credit card,47.8,1.0,0.5,7.92,0.0,1.0,60.72,2.5,0.0,NaN,NaN,Manhattan,Central Harlem,Boro Zone
-1,2024-01-01T00:15:34.000000000,2024-01-01T00:28:51.000000000,2,2.1,Standard rate,N,Credit card,14.2,3.5,0.5,3.8,0.0,1.0,23.0,2.5,0.0,NaN,NaN,Manhattan,Lincoln Square West,Yellow Zone
-2,2024-01-01T00:15:26.000000000,2024-01-01T00:33:57.000000000,1,11.51,Standard rate,N,Credit card,44.3,1.0,0.5,11.25,6.94,1.0,67.49,2.5,0.0,NaN,NaN,Queens,Murray Hill-Queens,Boro Zone
-2,2024-01-01T00:18:36.000000000,2024-01-01T00:40:49.000000000,1,1.79,Standard rate,N,Cash,19.8,1.0,0.5,0.0,0.0,1.0,24.8,2.5,0.0,NaN,NaN,Manhattan,East Chelsea,Yellow Zone
-1,2024-01-01T00:09:17.000000000,2024-01-01T00:16:55.000000000,2,2.5,Standard rate,N,Cash,12.1,3.5,0.5,0.0,0.0,1.0,17.1,2.5,0.0,NaN,NaN,Manhattan,Lenox Hill East,Yellow Zone
-1,2024-01-01T00:21:40.000000000,2024-01-01T00:27:05.000000000,1,1.6,Standard rate,N,Credit card,9.3,3.5,0.5,3.55,0.0,1.0,17.85,2.5,0.0,NaN,NaN,Manhattan,Sutton Place/Turtle Bay North,Yellow Zone
-1,2024-01-01T00:39:03.000000000,2024-01-01T00:44:28.000000000,4,1.1,Standard rate,N,Credit card,7.9,3.5,0.5,0.0,0.0,1.0,12.9,2.5,0.0,NaN,NaN,Manhattan,Upper West Side North,Yellow Zone
-1,2024-01-01T00:45:51.000000000,2024-01-01T00:49:43.000000000,2,0.7,Standard rate,N,Credit card,6.5,3.5,0.5,2.3,0.0,1.0,13.8,2.5,0.0,NaN,NaN,Manhattan,Lincoln Square East,Yellow Zone
-1,2024-01-01T00:50:46.000000000,2024-01-01T00:57:26.000000000,2,1.1,Standard rate,N,Dispute,8.6,3.5,0.5,0.0,0.0,1.0,13.6,2.5,0.0,NaN,NaN,Manhattan,Upper West Side South,Yellow Zone
-2,2024-01-01T00:09:49.000000000,2024-01-01T00:22:00.000000000,1,2.96,Standard rate,N,Credit card,14.9,1.0,0.5,3.98,0.0,1.0,23.88,2.5,0.0,NaN,NaN,Manhattan,West Village,Yellow Zone
-2,2024-01-01T00:36:44.000000000,2024-01-01T00:54:40.000000000,1,1.2,Standard rate,N,Credit card,16.3,1.0,0.5,4.26,0.0,1.0,25.56,2.5,0.0,NaN,NaN,Manhattan,Clinton East,Yellow Zone
-2,2024-01-01T00:58:11.000000000,2024-01-01T01:24:47.000000000,1,2.42,Standard rate,N,Credit card,23.3,1.0,0.5,0.0,0.0,1.0,28.3,2.5,0.0,NaN,NaN,Manhattan,Hudson Sq,Yellow Zone
-2,2024-01-01T00:24:41.000000000,2024-01-01T00:54:01.000000000,1,5.28,Standard rate,N,Credit card,31.0,1.0,0.5,7.2,0.0,1.0,43.2,2.5,0.0,NaN,NaN,Manhattan,Upper West Side North,Yellow Zone
-2,2024-01-01T00:55:58.000000000,2024-01-01T01:03:54.000000000,1,1.47,Standard rate,N,Credit card,10.0,1.0,0.5,2.0,0.0,1.0,17.0,2.5,0.0,NaN,NaN,Manhattan,Lincoln Square East,Yellow Zone
-2,2024-01-01T00:19:36.000000000,2024-01-01T00:31:57.000000000,3,2.41,Standard rate,N,Credit card,14.2,1.0,0.5,3.84,0.0,1.0,23.04,2.5,0.0,NaN,NaN,Manhattan,Upper East Side North,Yellow Zone
-2,2024-01-01T00:45:44.000000000,2024-01-01T00:51:25.000000000,4,1.04,Standard rate,N,Cash,7.9,1.0,0.5,0.0,0.0,1.0,12.9,2.5,0.0,NaN,NaN,Manhattan,Midtown North,Yellow Zone
-2,2024-01-01T00:55:21.000000000,2024-01-01T01:12:17.000000000,4,2.41,Standard rate,N,Credit card,17.7,1.0,0.5,4.54,0.0,1.0,27.24,2.5,0.0,NaN,NaN,Manhattan,Lenox Hill East,Yellow Zone
-2,2024-01-01T00:05:45.000000000,2024-01-01T00:17:29.000000000,1,1.06,Standard rate,N,Cash,11.4,1.0,0.5,0.0,0.0,1.0,16.4,2.5,0.0,NaN,NaN,Manhattan,Flatiron,Yellow Zone
-2,2024-01-01T00:18:38.000000000,2024-01-01T00:26:09.000000000,1,0.83,Standard rate,N,Credit card,8.6,1.0,0.5,3.4,0.0,1.0,17.0,2.5,0.0,NaN,NaN,Manhattan,Murray Hill,Yellow Zone
-2,2024-01-01T00:38:58.000000000,2024-01-01T00:53:37.000000000,1,1.94,Standard rate,N,Credit card,14.9,1.0,0.5,3.98,0.0,1.0,23.88,2.5,0.0,NaN,NaN,Manhattan,East Village,Yellow Zone
-2,2024-01-01T00:58:18.000000000,2024-01-01T01:11:51.000000000,1,2.23,Standard rate,N,Credit card,14.2,1.0,0.5,2.0,0.0,1.0,21.2,2.5,0.0,NaN,NaN,Manhattan,Sutton Place/Turtle Bay North,Yellow Zone
-2,2024-01-01T00:14:43.000000000,2024-01-01T00:20:30.000000000,1,0.78,Standard rate,N,Credit card,7.2,1.0,0.5,3.05,0.0,1.0,15.25,2.5,0.0,NaN,NaN,Manhattan,Upper West Side South,Yellow Zone
-2,2024-01-01T00:22:44.000000000,2024-01-01T00:35:03.000000000,1,2.02,Standard rate,N,Credit card,14.2,1.0,0.5,3.0,0.0,1.0,22.2,2.5,0.0,NaN,NaN,Manhattan,Yorkville East,Yellow Zone
-2,2024-01-01T00:50:08.000000000,2024-01-01T01:00:50.000000000,1,0.57,Standard rate,N,Cash,9.3,1.0,0.5,0.0,0.0,1.0,14.3,2.5,0.0,NaN,NaN,Manhattan,Midtown North,Yellow Zone
-2,2024-01-01T00:36:26.000000000,2024-01-01T01:08:23.000000000,1,11.48,Standard rate,N,Credit card,47.8,1.0,0.5,10.56,0.0,1.0,63.36,2.5,0.0,NaN,NaN,Manhattan,Washington Heights South,Boro Zone
-2,2024-01-01T00:13:52.000000000,2024-01-01T00:29:41.000000000,1,8.89,Standard rate,N,Credit card,35.2,6.0,0.5,10.43,6.94,1.0,64.32,2.5,1.75,NaN,NaN,Manhattan,Gramercy,Yellow Zone
-2,2024-01-01T00:40:01.000000000,2024-01-01T01:18:26.000000000,2,5.27,Standard rate,N,Credit card,38.0,1.0,0.5,8.6,0.0,1.0,51.6,2.5,0.0,NaN,NaN,Manhattan,West Chelsea/Hudson Yards,Yellow Zone
-1,2024-01-01T00:24:31.000000000,2024-01-01T00:41:04.000000000,1,6.6,Standard rate,N,Cash,28.2,3.5,0.5,0.0,0.0,1.0,33.2,2.5,0.0,NaN,NaN,Manhattan,Washington Heights South,Boro Zone
-2,2024-01-01T00:09:29.000000000,2024-01-01T00:24:42.000000000,1,3.91,Standard rate,N,Cash,19.1,1.0,0.5,0.0,0.0,1.0,24.1,2.5,0.0,NaN,NaN,Manhattan,Roosevelt Island,Boro Zone
-2,2024-01-01T00:34:30.000000000,2024-01-01T00:43:24.000000000,2,1.24,Standard rate,N,Credit card,10.0,1.0,0.5,3.75,0.0,1.0,18.75,2.5,0.0,NaN,NaN,Manhattan,East Village,Yellow Zone
-2,2024-01-01T00:45:26.000000000,2024-01-01T01:23:16.000000000,2,5.35,Standard rate,N,Credit card,34.5,1.0,0.5,6.08,0.0,1.0,45.58,2.5,0.0,NaN,NaN,Manhattan,Clinton East,Yellow Zone
-1,2024-01-01T00:14:47.000000000,2024-01-01T00:40:55.000000000,1,3.0,Standard rate,N,Cash,21.9,3.5,0.5,0.0,0.0,1.0,26.9,2.5,0.0,NaN,NaN,Manhattan,East Chelsea,Yellow Zone
-1,2024-01-01T00:47:51.000000000,2024-01-01T01:21:04.000000000,1,3.8,Standard rate,N,Credit card,27.5,3.5,0.5,7.9,6.94,1.0,47.34,2.5,0.0,NaN,NaN,Queens,Long Island City/Hunters Point,Boro Zone
-2,2024-01-01T00:32:03.000000000,2024-01-01T00:54:57.000000000,2,1.69,Standard rate,N,Credit card,19.8,1.0,0.5,1.0,0.0,1.0,25.8,2.5,0.0,NaN,NaN,Manhattan,Flatiron,Yellow Zone
-1,2024-01-01T00:38:04.000000000,2024-01-01T00:42:53.000000000,2,0.7,Standard rate,N,Credit card,6.5,3.5,0.5,2.0,0.0,1.0,13.5,2.5,0.0,NaN,NaN,Manhattan,Lincoln Square East,Yellow Zone
-1,2024-01-01T00:48:30.000000000,2024-01-01T01:03:44.000000000,1,0.8,Standard rate,N,Cash,13.5,3.5,0.5,0.0,0.0,1.0,18.5,2.5,0.0,NaN,NaN,Manhattan,East Chelsea,Yellow Zone
-2,2024-01-01T00:18:51.000000000,2024-01-01T00:33:03.000000000,1,2.14,Standard rate,N,Credit card,14.9,1.0,0.5,5.97,0.0,1.0,25.87,2.5,0.0,NaN,NaN,Manhattan,Two Bridges/Seward Park,Yellow Zone
-2,2024-01-01T00:39:51.000000000,2024-01-01T00:48:56.000000000,2,1.79,Standard rate,N,Credit card,11.4,1.0,0.5,4.92,0.0,1.0,21.32,2.5,0.0,NaN,NaN,Manhattan,West Village,Yellow Zone
-1,2024-01-01T00:57:24.000000000,2024-01-01T01:06:53.000000000,2,1.2,Standard rate,N,Credit card,10.7,3.5,0.5,2.36,0.0,1.0,18.06,2.5,0.0,NaN,NaN,Manhattan,Gramercy,Yellow Zone
-2,2024-01-01T00:44:37.000000000,2024-01-01T00:56:29.000000000,2,1.01,Standard rate,N,Credit card,11.4,1.0,0.5,4.1,0.0,1.0,20.5,2.5,0.0,NaN,NaN,Manhattan,Gramercy,Yellow Zone
-2,2024-01-01T00:39:47.000000000,2024-01-01T01:00:24.000000000,1,2.21,Standard rate,N,Credit card,18.4,1.0,0.5,4.68,0.0,1.0,28.08,2.5,0.0,NaN,NaN,Manhattan,Kips Bay,Yellow Zone
-2,2024-01-01T00:13:55.000000000,2024-01-01T00:27:27.000000000,1,2.12,Standard rate,N,Credit card,14.2,1.0,0.5,3.84,0.0,1.0,23.04,2.5,0.0,NaN,NaN,Manhattan,Lower East Side,Yellow Zone
-2,2024-01-01T00:33:00.000000000,2024-01-01T00:51:54.000000000,1,3.6,Standard rate,N,Credit card,19.8,1.0,0.5,4.96,0.0,1.0,29.76,2.5,0.0,NaN,NaN,Manhattan,Lenox Hill West,Yellow Zone
-2,2024-01-01T00:29:21.000000000,2024-01-01T00:34:32.000000000,2,0.67,Standard rate,N,Credit card,7.2,1.0,0.5,2.44,0.0,1.0,14.64,2.5,0.0,NaN,NaN,Manhattan,Upper East Side North,Yellow Zone
-2,2024-01-01T00:36:09.000000000,2024-01-01T01:08:16.000000000,1,2.88,Standard rate,N,Credit card,27.5,1.0,0.5,6.5,0.0,1.0,39.0,2.5,0.0,NaN,NaN,Manhattan,Kips Bay,Yellow Zone
-2,2024-01-01T00:46:16.000000000,2024-01-01T01:20:10.000000000,1,20.85,JFK,N,Credit card,70.0,0.0,0.5,0.0,6.94,1.0,82.69,2.5,1.75,NaN,NaN,Manhattan,Upper West Side South,Yellow Zone
-2,2024-01-01T00:14:52.000000000,2024-01-01T00:17:38.000000000,5,0.55,Standard rate,N,Credit card,5.1,1.0,0.5,1.52,0.0,1.0,11.62,2.5,0.0,NaN,NaN,Manhattan,Lincoln Square West,Yellow Zone
-2,2024-01-01T00:22:06.000000000,2024-01-01T00:51:28.000000000,5,3.1,Standard rate,N,Credit card,26.8,1.0,0.5,6.36,0.0,1.0,38.16,2.5,0.0,NaN,NaN,Manhattan,Murray Hill,Yellow Zone
-1,2024-01-01T00:27:23.000000000,2024-01-01T00:35:26.000000000,4,1.0,Standard rate,N,Credit card,9.3,3.5,0.5,5.0,0.0,1.0,19.3,2.5,0.0,NaN,NaN,Manhattan,Midtown Center,Yellow Zone
-1,2024-01-01T00:45:38.000000000,2024-01-01T01:01:57.000000000,2,1.8,Standard rate,N,Credit card,16.3,3.5,0.5,4.26,0.0,1.0,25.56,2.5,0.0,NaN,NaN,Manhattan,Upper East Side North,Yellow Zone
-2,2024-01-01T00:21:22.000000000,2024-01-01T00:45:26.000000000,1,1.88,Standard rate,N,Cash,20.5,1.0,0.5,0.0,0.0,1.0,25.5,2.5,0.0,NaN,NaN,Manhattan,Midtown East,Yellow Zone
-2,2024-01-01T00:52:30.000000000,2024-01-01T01:10:29.000000000,1,1.84,Standard rate,N,Credit card,16.3,1.0,0.5,5.33,0.0,1.0,26.63,2.5,0.0,NaN,NaN,Manhattan,Greenwich Village North,Yellow Zone
-2,2024-01-01T00:08:48.000000000,2024-01-01T00:09:33.000000000,1,0.05,Standard rate,N,Credit card,3.0,1.0,0.5,0.08,0.0,1.0,8.08,2.5,0.0,NaN,NaN,Manhattan,East Chelsea,Yellow Zone
-2,2024-01-01T00:33:59.000000000,2024-01-01T00:39:53.000000000,1,0.71,Standard rate,N,Credit card,7.2,1.0,0.5,3.66,0.0,1.0,15.86,2.5,0.0,NaN,NaN,Manhattan,Lincoln Square East,Yellow Zone
-1,2024-01-01T00:27:13.000000000,2024-01-01T00:29:51.000000000,2,0.2,Standard rate,N,Credit card,4.4,3.5,0.5,0.0,0.0,1.0,9.4,2.5,0.0,NaN,NaN,Manhattan,UN/Turtle Bay South,Yellow Zone
-1,2024-01-01T00:50:29.000000000,2024-01-01T01:42:04.000000000,4,2.3,Standard rate,N,Cash,40.1,3.5,0.5,0.0,0.0,1.0,45.1,2.5,0.0,NaN,NaN,Manhattan,Penn Station/Madison Sq West,Yellow Zone
-1,2024-01-01T00:54:24.000000000,2024-01-01T01:28:53.000000000,1,9.5,Standard rate,N,Credit card,44.3,3.5,0.5,9.85,0.0,1.0,59.15,2.5,0.0,NaN,NaN,Brooklyn,Park Slope,Boro Zone
-2,2024-01-01T00:27:02.000000000,2024-01-01T01:03:56.000000000,1,5.91,Standard rate,N,Credit card,35.2,1.0,0.5,8.04,0.0,1.0,48.24,2.5,0.0,NaN,NaN,Manhattan,Washington Heights South,Boro Zone
-2,2024-01-01T00:21:00.000000000,2024-01-01T00:46:17.000000000,1,1.51,Standard rate,N,Credit card,21.2,1.0,0.5,4.74,0.0,1.0,28.44,0.0,0.0,NaN,NaN,Manhattan,Clinton West,Yellow Zone
-2,2024-01-01T00:50:40.000000000,2024-01-01T01:13:44.000000000,1,1.11,Standard rate,N,Cash,20.5,1.0,0.5,0.0,0.0,1.0,23.0,0.0,0.0,NaN,NaN,Manhattan,UN/Turtle Bay South,Yellow Zone
-2,2024-01-01T00:07:59.000000000,2024-01-01T00:14:37.000000000,1,1.52,Standard rate,N,Credit card,9.3,1.0,0.5,2.86,0.0,1.0,17.16,2.5,0.0,NaN,NaN,Manhattan,Lenox Hill West,Yellow Zone
-2,2024-01-01T00:30:53.000000000,2024-01-01T00:40:38.000000000,1,3.04,Standard rate,N,Credit card,14.9,1.0,0.5,3.98,0.0,1.0,23.88,2.5,0.0,NaN,NaN,Manhattan,Lower East Side,Yellow Zone
-1,2024-01-01T00:20:39.000000000,2024-01-01T00:33:30.000000000,2,2.1,Standard rate,N,Credit card,12.8,3.5,0.5,0.0,0.0,1.0,17.8,2.5,0.0,NaN,NaN,Manhattan,Murray Hill,Yellow Zone
-2,2024-01-01T00:19:39.000000000,2024-01-01T00:41:38.000000000,1,1.55,Standard rate,N,Cash,19.1,1.0,0.5,0.0,0.0,1.0,24.1,2.5,0.0,NaN,NaN,Manhattan,Clinton West,Yellow Zone
-2,2024-01-01T00:42:43.000000000,2024-01-01T00:50:49.000000000,1,2.0,Standard rate,N,Credit card,10.7,1.0,0.5,3.14,0.0,1.0,18.84,2.5,0.0,NaN,NaN,Manhattan,Upper West Side North,Yellow Zone
-2,2024-01-01T00:54:16.000000000,2024-01-01T01:27:40.000000000,1,13.74,Standard rate,N,Credit card,56.9,1.0,0.5,13.77,6.94,1.0,82.61,2.5,0.0,NaN,NaN,Queens,Forest Hills,Boro Zone
-2,2024-01-01T00:13:58.000000000,2024-01-01T00:33:39.000000000,1,4.2,Standard rate,N,Credit card,21.9,1.0,0.5,5.38,0.0,1.0,32.28,2.5,0.0,NaN,NaN,Manhattan,Upper East Side South,Yellow Zone
-2,2024-01-01T00:35:53.000000000,2024-01-01T00:47:59.000000000,1,1.14,Standard rate,N,Credit card,11.4,1.0,0.5,3.28,0.0,1.0,19.68,2.5,0.0,NaN,NaN,Manhattan,UN/Turtle Bay South,Yellow Zone
-2,2024-01-01T00:50:28.000000000,2024-01-01T01:38:39.000000000,1,20.34,Standard rate,N,Credit card,80.0,1.0,0.5,2.0,0.0,1.0,86.25,0.0,1.75,NaN,NaN,Brooklyn,Borough Park,Boro Zone
-2,2024-01-01T00:18:24.000000000,2024-01-01T00:30:39.000000000,1,2.16,Standard rate,N,Dispute,-13.5,-1.0,-0.5,0.0,0.0,-1.0,-18.5,-2.5,0.0,NaN,NaN,Manhattan,Two Bridges/Seward Park,Yellow Zone
+vendor_id,pickup_datetime,dropoff_datetime,passenger_count,trip_distance,ratecode_id,store_and_fwd_flag,payment_type,fare_amount,extra,mta_tax,tip_amount,tolls_amount,improvement_surcharge,total_amount,congestion_surcharge,airport_fee,ehail_fee,trip_type,borough,zone,service_zone,taxi_type
+2,2024-01-01T00:57:55.000000000,2024-01-01T01:17:43.000000000,1,1.72,Standard rate,N,Cash,17.7,1.0,0.5,0.0,0.0,1.0,22.7,2.5,0.0,NaN,NaN,Manhattan,East Village,Yellow Zone,yellow
+1,2024-01-01T00:03:00.000000000,2024-01-01T00:09:36.000000000,1,1.8,Standard rate,N,Credit card,10.0,3.5,0.5,3.75,0.0,1.0,18.75,2.5,0.0,NaN,NaN,Manhattan,Upper East Side North,Yellow Zone,yellow
+1,2024-01-01T00:17:06.000000000,2024-01-01T00:35:01.000000000,1,4.7,Standard rate,N,Credit card,23.3,3.5,0.5,3.0,0.0,1.0,31.3,2.5,0.0,NaN,NaN,Manhattan,East Village,Yellow Zone,yellow
+1,2024-01-01T00:36:38.000000000,2024-01-01T00:44:56.000000000,1,1.4,Standard rate,N,Credit card,10.0,3.5,0.5,2.0,0.0,1.0,17.0,2.5,0.0,NaN,NaN,Manhattan,SoHo,Yellow Zone,yellow
+1,2024-01-01T00:46:51.000000000,2024-01-01T00:52:57.000000000,1,0.8,Standard rate,N,Credit card,7.9,3.5,0.5,3.2,0.0,1.0,16.1,2.5,0.0,NaN,NaN,Manhattan,Lower East Side,Yellow Zone,yellow
+1,2024-01-01T00:54:08.000000000,2024-01-01T01:26:31.000000000,1,4.7,Standard rate,N,Credit card,29.6,3.5,0.5,6.9,0.0,1.0,41.5,2.5,0.0,NaN,NaN,Manhattan,Lenox Hill West,Yellow Zone,yellow
+2,2024-01-01T00:49:44.000000000,2024-01-01T01:15:47.000000000,2,10.82,Standard rate,N,Credit card,45.7,6.0,0.5,10.0,0.0,1.0,64.95,0.0,1.75,NaN,NaN,Brooklyn,Park Slope,Boro Zone,yellow
+1,2024-01-01T00:30:40.000000000,2024-01-01T00:58:40.000000000,0,3.0,Standard rate,N,Cash,25.4,3.5,0.5,0.0,0.0,1.0,30.4,2.5,0.0,NaN,NaN,Manhattan,TriBeCa/Civic Center,Yellow Zone,yellow
+2,2024-01-01T00:26:01.000000000,2024-01-01T00:54:12.000000000,1,5.44,Standard rate,N,Cash,31.0,1.0,0.5,0.0,0.0,1.0,36.0,2.5,0.0,NaN,NaN,Manhattan,World Trade Center,Yellow Zone,yellow
+2,2024-01-01T00:28:08.000000000,2024-01-01T00:29:16.000000000,1,0.04,Standard rate,N,Cash,3.0,1.0,0.5,0.0,0.0,1.0,8.0,2.5,0.0,NaN,NaN,Manhattan,Greenwich Village North,Yellow Zone,yellow
+2,2024-01-01T00:35:22.000000000,2024-01-01T00:41:41.000000000,2,0.75,Standard rate,N,Credit card,7.9,1.0,0.5,0.0,0.0,1.0,12.9,2.5,0.0,NaN,NaN,Manhattan,Kips Bay,Yellow Zone,yellow
+1,2024-01-01T00:25:00.000000000,2024-01-01T00:34:03.000000000,2,1.2,Standard rate,N,Credit card,14.9,3.5,0.5,3.95,0.0,1.0,23.85,2.5,0.0,NaN,NaN,Manhattan,West Chelsea/Hudson Yards,Yellow Zone,yellow
+1,2024-01-01T00:35:16.000000000,2024-01-01T01:11:52.000000000,2,8.2,Standard rate,N,Credit card,59.0,3.5,0.5,14.15,6.94,1.0,85.09,2.5,0.0,NaN,NaN,Brooklyn,Prospect Park,Boro Zone,yellow
+1,2024-01-01T00:43:27.000000000,2024-01-01T00:47:11.000000000,2,0.4,Standard rate,N,Credit card,5.8,3.5,0.5,1.25,0.0,1.0,12.05,2.5,0.0,NaN,NaN,Manhattan,Flatiron,Yellow Zone,yellow
+1,2024-01-01T00:51:53.000000000,2024-01-01T00:55:43.000000000,1,0.8,Standard rate,N,Cash,6.5,3.5,0.5,0.0,0.0,1.0,11.5,2.5,0.0,NaN,NaN,Manhattan,East Chelsea,Yellow Zone,yellow
+1,2024-01-01T00:50:09.000000000,2024-01-01T01:03:57.000000000,1,5.0,Standard rate,N,Cash,21.2,2.75,0.5,0.0,0.0,1.0,25.45,0.0,1.75,NaN,NaN,Queens,South Ozone Park,Boro Zone,yellow
+1,2024-01-01T00:41:06.000000000,2024-01-01T00:53:42.000000000,1,1.5,Standard rate,N,Credit card,12.8,3.5,0.5,4.45,0.0,1.0,22.25,2.5,0.0,NaN,NaN,Manhattan,East Village,Yellow Zone,yellow
+2,2024-01-01T00:52:09.000000000,2024-01-01T00:52:28.000000000,1,0.0,Standard rate,N,Cash,3.0,1.0,0.5,0.0,0.0,1.0,8.0,2.5,0.0,NaN,NaN,Manhattan,Upper East Side South,Yellow Zone,yellow
+2,2024-01-01T00:56:38.000000000,2024-01-01T01:03:17.000000000,1,1.5,Standard rate,N,Credit card,9.3,1.0,0.5,3.0,0.0,1.0,17.3,2.5,0.0,NaN,NaN,Manhattan,Yorkville West,Yellow Zone,yellow
+2,2024-01-01T00:32:34.000000000,2024-01-01T00:49:33.000000000,1,2.57,Standard rate,N,Credit card,17.7,1.0,0.5,10.0,0.0,1.0,32.7,2.5,0.0,NaN,NaN,Manhattan,Yorkville West,Yellow Zone,yellow
+2,2024-01-01T00:52:30.000000000,2024-01-01T00:57:37.000000000,1,0.66,Standard rate,N,Credit card,6.5,1.0,0.5,2.88,0.0,1.0,14.38,2.5,0.0,NaN,NaN,Manhattan,Upper East Side North,Yellow Zone,yellow
+1,2024-01-01T00:36:30.000000000,2024-01-01T01:13:53.000000000,2,1.7,Standard rate,N,Credit card,29.6,3.5,0.5,6.9,0.0,1.0,41.5,2.5,0.0,NaN,NaN,Manhattan,Murray Hill,Yellow Zone,yellow
+2,2024-01-01T00:44:24.000000000,2024-01-01T00:51:57.000000000,1,0.94,Standard rate,N,Credit card,8.6,1.0,0.5,2.72,0.0,1.0,16.32,2.5,0.0,NaN,NaN,Manhattan,Greenwich Village North,Yellow Zone,yellow
+1,2024-01-01T00:14:29.000000000,2024-01-01T00:14:29.000000000,1,0.0,Standard rate,N,Cash,3.0,3.5,0.5,0.0,0.0,1.0,8.0,2.5,0.0,NaN,NaN,Unknown,N/A,N/A,yellow
+1,2024-01-01T00:42:05.000000000,2024-01-01T01:16:49.000000000,1,23.9,Negotiated fare,N,Credit card,120.0,0.0,0.0,0.0,6.94,1.0,127.94,0.0,0.0,NaN,NaN,N/A,Outside of NYC,N/A,yellow
+2,2024-01-01T00:12:35.000000000,2024-01-01T00:19:21.000000000,2,1.08,Standard rate,N,Credit card,8.6,1.0,0.5,2.72,0.0,1.0,16.32,2.5,0.0,NaN,NaN,Manhattan,Alphabet City,Yellow Zone,yellow
+2,2024-01-01T00:20:11.000000000,2024-01-01T00:42:53.000000000,1,5.88,Standard rate,N,Credit card,28.9,1.0,0.5,2.5,0.0,1.0,36.4,2.5,0.0,NaN,NaN,Manhattan,Upper West Side North,Yellow Zone,yellow
+2,2024-01-01T00:44:01.000000000,2024-01-01T00:54:31.000000000,2,2.22,Standard rate,N,Credit card,13.5,1.0,0.5,0.0,0.0,1.0,18.5,2.5,0.0,NaN,NaN,Manhattan,Clinton West,Yellow Zone,yellow
+1,2024-01-01T00:08:12.000000000,2024-01-01T00:41:08.000000000,1,5.1,Standard rate,N,Cash,28.9,3.5,0.5,0.0,0.0,1.0,33.9,2.5,0.0,NaN,NaN,Manhattan,Greenwich Village South,Yellow Zone,yellow
+2,2024-01-01T00:36:25.000000000,2024-01-01T00:47:26.000000000,2,2.09,Standard rate,N,Credit card,12.8,1.0,0.5,3.56,0.0,1.0,21.36,2.5,0.0,NaN,NaN,Manhattan,East Village,Yellow Zone,yellow
+2,2024-01-01T00:49:31.000000000,2024-01-01T01:35:41.000000000,2,8.89,Standard rate,N,Credit card,47.8,1.0,0.5,7.92,0.0,1.0,60.72,2.5,0.0,NaN,NaN,Manhattan,Central Harlem,Boro Zone,yellow
+1,2024-01-01T00:15:34.000000000,2024-01-01T00:28:51.000000000,2,2.1,Standard rate,N,Credit card,14.2,3.5,0.5,3.8,0.0,1.0,23.0,2.5,0.0,NaN,NaN,Manhattan,Lincoln Square West,Yellow Zone,yellow
+2,2024-01-01T00:15:26.000000000,2024-01-01T00:33:57.000000000,1,11.51,Standard rate,N,Credit card,44.3,1.0,0.5,11.25,6.94,1.0,67.49,2.5,0.0,NaN,NaN,Queens,Murray Hill-Queens,Boro Zone,yellow
+2,2024-01-01T00:18:36.000000000,2024-01-01T00:40:49.000000000,1,1.79,Standard rate,N,Cash,19.8,1.0,0.5,0.0,0.0,1.0,24.8,2.5,0.0,NaN,NaN,Manhattan,East Chelsea,Yellow Zone,yellow
+1,2024-01-01T00:09:17.000000000,2024-01-01T00:16:55.000000000,2,2.5,Standard rate,N,Cash,12.1,3.5,0.5,0.0,0.0,1.0,17.1,2.5,0.0,NaN,NaN,Manhattan,Lenox Hill East,Yellow Zone,yellow
+1,2024-01-01T00:21:40.000000000,2024-01-01T00:27:05.000000000,1,1.6,Standard rate,N,Credit card,9.3,3.5,0.5,3.55,0.0,1.0,17.85,2.5,0.0,NaN,NaN,Manhattan,Sutton Place/Turtle Bay North,Yellow Zone,yellow
+1,2024-01-01T00:39:03.000000000,2024-01-01T00:44:28.000000000,4,1.1,Standard rate,N,Credit card,7.9,3.5,0.5,0.0,0.0,1.0,12.9,2.5,0.0,NaN,NaN,Manhattan,Upper West Side North,Yellow Zone,yellow
+1,2024-01-01T00:45:51.000000000,2024-01-01T00:49:43.000000000,2,0.7,Standard rate,N,Credit card,6.5,3.5,0.5,2.3,0.0,1.0,13.8,2.5,0.0,NaN,NaN,Manhattan,Lincoln Square East,Yellow Zone,yellow
+1,2024-01-01T00:50:46.000000000,2024-01-01T00:57:26.000000000,2,1.1,Standard rate,N,Dispute,8.6,3.5,0.5,0.0,0.0,1.0,13.6,2.5,0.0,NaN,NaN,Manhattan,Upper West Side South,Yellow Zone,yellow
+2,2024-01-01T00:09:49.000000000,2024-01-01T00:22:00.000000000,1,2.96,Standard rate,N,Credit card,14.9,1.0,0.5,3.98,0.0,1.0,23.88,2.5,0.0,NaN,NaN,Manhattan,West Village,Yellow Zone,yellow
+2,2024-01-01T00:36:44.000000000,2024-01-01T00:54:40.000000000,1,1.2,Standard rate,N,Credit card,16.3,1.0,0.5,4.26,0.0,1.0,25.56,2.5,0.0,NaN,NaN,Manhattan,Clinton East,Yellow Zone,yellow
+2,2024-01-01T00:58:11.000000000,2024-01-01T01:24:47.000000000,1,2.42,Standard rate,N,Credit card,23.3,1.0,0.5,0.0,0.0,1.0,28.3,2.5,0.0,NaN,NaN,Manhattan,Hudson Sq,Yellow Zone,yellow
+2,2024-01-01T00:24:41.000000000,2024-01-01T00:54:01.000000000,1,5.28,Standard rate,N,Credit card,31.0,1.0,0.5,7.2,0.0,1.0,43.2,2.5,0.0,NaN,NaN,Manhattan,Upper West Side North,Yellow Zone,yellow
+2,2024-01-01T00:55:58.000000000,2024-01-01T01:03:54.000000000,1,1.47,Standard rate,N,Credit card,10.0,1.0,0.5,2.0,0.0,1.0,17.0,2.5,0.0,NaN,NaN,Manhattan,Lincoln Square East,Yellow Zone,yellow
+2,2024-01-01T00:19:36.000000000,2024-01-01T00:31:57.000000000,3,2.41,Standard rate,N,Credit card,14.2,1.0,0.5,3.84,0.0,1.0,23.04,2.5,0.0,NaN,NaN,Manhattan,Upper East Side North,Yellow Zone,yellow
+2,2024-01-01T00:45:44.000000000,2024-01-01T00:51:25.000000000,4,1.04,Standard rate,N,Cash,7.9,1.0,0.5,0.0,0.0,1.0,12.9,2.5,0.0,NaN,NaN,Manhattan,Midtown North,Yellow Zone,yellow
+2,2024-01-01T00:55:21.000000000,2024-01-01T01:12:17.000000000,4,2.41,Standard rate,N,Credit card,17.7,1.0,0.5,4.54,0.0,1.0,27.24,2.5,0.0,NaN,NaN,Manhattan,Lenox Hill East,Yellow Zone,yellow
+2,2024-01-01T00:05:45.000000000,2024-01-01T00:17:29.000000000,1,1.06,Standard rate,N,Cash,11.4,1.0,0.5,0.0,0.0,1.0,16.4,2.5,0.0,NaN,NaN,Manhattan,Flatiron,Yellow Zone,yellow
+2,2024-01-01T00:18:38.000000000,2024-01-01T00:26:09.000000000,1,0.83,Standard rate,N,Credit card,8.6,1.0,0.5,3.4,0.0,1.0,17.0,2.5,0.0,NaN,NaN,Manhattan,Murray Hill,Yellow Zone,yellow
+2,2024-01-01T00:38:58.000000000,2024-01-01T00:53:37.000000000,1,1.94,Standard rate,N,Credit card,14.9,1.0,0.5,3.98,0.0,1.0,23.88,2.5,0.0,NaN,NaN,Manhattan,East Village,Yellow Zone,yellow
+2,2024-01-01T00:58:18.000000000,2024-01-01T01:11:51.000000000,1,2.23,Standard rate,N,Credit card,14.2,1.0,0.5,2.0,0.0,1.0,21.2,2.5,0.0,NaN,NaN,Manhattan,Sutton Place/Turtle Bay North,Yellow Zone,yellow
+2,2024-01-01T00:14:43.000000000,2024-01-01T00:20:30.000000000,1,0.78,Standard rate,N,Credit card,7.2,1.0,0.5,3.05,0.0,1.0,15.25,2.5,0.0,NaN,NaN,Manhattan,Upper West Side South,Yellow Zone,yellow
+2,2024-01-01T00:22:44.000000000,2024-01-01T00:35:03.000000000,1,2.02,Standard rate,N,Credit card,14.2,1.0,0.5,3.0,0.0,1.0,22.2,2.5,0.0,NaN,NaN,Manhattan,Yorkville East,Yellow Zone,yellow
+2,2024-01-01T00:50:08.000000000,2024-01-01T01:00:50.000000000,1,0.57,Standard rate,N,Cash,9.3,1.0,0.5,0.0,0.0,1.0,14.3,2.5,0.0,NaN,NaN,Manhattan,Midtown North,Yellow Zone,yellow
+2,2024-01-01T00:36:26.000000000,2024-01-01T01:08:23.000000000,1,11.48,Standard rate,N,Credit card,47.8,1.0,0.5,10.56,0.0,1.0,63.36,2.5,0.0,NaN,NaN,Manhattan,Washington Heights South,Boro Zone,yellow
+2,2024-01-01T00:13:52.000000000,2024-01-01T00:29:41.000000000,1,8.89,Standard rate,N,Credit card,35.2,6.0,0.5,10.43,6.94,1.0,64.32,2.5,1.75,NaN,NaN,Manhattan,Gramercy,Yellow Zone,yellow
+2,2024-01-01T00:40:01.000000000,2024-01-01T01:18:26.000000000,2,5.27,Standard rate,N,Credit card,38.0,1.0,0.5,8.6,0.0,1.0,51.6,2.5,0.0,NaN,NaN,Manhattan,West Chelsea/Hudson Yards,Yellow Zone,yellow
+1,2024-01-01T00:24:31.000000000,2024-01-01T00:41:04.000000000,1,6.6,Standard rate,N,Cash,28.2,3.5,0.5,0.0,0.0,1.0,33.2,2.5,0.0,NaN,NaN,Manhattan,Washington Heights South,Boro Zone,yellow
+2,2024-01-01T00:09:29.000000000,2024-01-01T00:24:42.000000000,1,3.91,Standard rate,N,Cash,19.1,1.0,0.5,0.0,0.0,1.0,24.1,2.5,0.0,NaN,NaN,Manhattan,Roosevelt Island,Boro Zone,yellow
+2,2024-01-01T00:34:30.000000000,2024-01-01T00:43:24.000000000,2,1.24,Standard rate,N,Credit card,10.0,1.0,0.5,3.75,0.0,1.0,18.75,2.5,0.0,NaN,NaN,Manhattan,East Village,Yellow Zone,yellow
+2,2024-01-01T00:45:26.000000000,2024-01-01T01:23:16.000000000,2,5.35,Standard rate,N,Credit card,34.5,1.0,0.5,6.08,0.0,1.0,45.58,2.5,0.0,NaN,NaN,Manhattan,Clinton East,Yellow Zone,yellow
+1,2024-01-01T00:14:47.000000000,2024-01-01T00:40:55.000000000,1,3.0,Standard rate,N,Cash,21.9,3.5,0.5,0.0,0.0,1.0,26.9,2.5,0.0,NaN,NaN,Manhattan,East Chelsea,Yellow Zone,yellow
+1,2024-01-01T00:47:51.000000000,2024-01-01T01:21:04.000000000,1,3.8,Standard rate,N,Credit card,27.5,3.5,0.5,7.9,6.94,1.0,47.34,2.5,0.0,NaN,NaN,Queens,Long Island City/Hunters Point,Boro Zone,yellow
+2,2024-01-01T00:32:03.000000000,2024-01-01T00:54:57.000000000,2,1.69,Standard rate,N,Credit card,19.8,1.0,0.5,1.0,0.0,1.0,25.8,2.5,0.0,NaN,NaN,Manhattan,Flatiron,Yellow Zone,yellow
+1,2024-01-01T00:38:04.000000000,2024-01-01T00:42:53.000000000,2,0.7,Standard rate,N,Credit card,6.5,3.5,0.5,2.0,0.0,1.0,13.5,2.5,0.0,NaN,NaN,Manhattan,Lincoln Square East,Yellow Zone,yellow
+1,2024-01-01T00:48:30.000000000,2024-01-01T01:03:44.000000000,1,0.8,Standard rate,N,Cash,13.5,3.5,0.5,0.0,0.0,1.0,18.5,2.5,0.0,NaN,NaN,Manhattan,East Chelsea,Yellow Zone,yellow
+2,2024-01-01T00:18:51.000000000,2024-01-01T00:33:03.000000000,1,2.14,Standard rate,N,Credit card,14.9,1.0,0.5,5.97,0.0,1.0,25.87,2.5,0.0,NaN,NaN,Manhattan,Two Bridges/Seward Park,Yellow Zone,yellow
+2,2024-01-01T00:39:51.000000000,2024-01-01T00:48:56.000000000,2,1.79,Standard rate,N,Credit card,11.4,1.0,0.5,4.92,0.0,1.0,21.32,2.5,0.0,NaN,NaN,Manhattan,West Village,Yellow Zone,yellow
+1,2024-01-01T00:57:24.000000000,2024-01-01T01:06:53.000000000,2,1.2,Standard rate,N,Credit card,10.7,3.5,0.5,2.36,0.0,1.0,18.06,2.5,0.0,NaN,NaN,Manhattan,Gramercy,Yellow Zone,yellow
+2,2024-01-01T00:44:37.000000000,2024-01-01T00:56:29.000000000,2,1.01,Standard rate,N,Credit card,11.4,1.0,0.5,4.1,0.0,1.0,20.5,2.5,0.0,NaN,NaN,Manhattan,Gramercy,Yellow Zone,yellow
+2,2024-01-01T00:39:47.000000000,2024-01-01T01:00:24.000000000,1,2.21,Standard rate,N,Credit card,18.4,1.0,0.5,4.68,0.0,1.0,28.08,2.5,0.0,NaN,NaN,Manhattan,Kips Bay,Yellow Zone,yellow
+2,2024-01-01T00:13:55.000000000,2024-01-01T00:27:27.000000000,1,2.12,Standard rate,N,Credit card,14.2,1.0,0.5,3.84,0.0,1.0,23.04,2.5,0.0,NaN,NaN,Manhattan,Lower East Side,Yellow Zone,yellow
+2,2024-01-01T00:33:00.000000000,2024-01-01T00:51:54.000000000,1,3.6,Standard rate,N,Credit card,19.8,1.0,0.5,4.96,0.0,1.0,29.76,2.5,0.0,NaN,NaN,Manhattan,Lenox Hill West,Yellow Zone,yellow
+2,2024-01-01T00:29:21.000000000,2024-01-01T00:34:32.000000000,2,0.67,Standard rate,N,Credit card,7.2,1.0,0.5,2.44,0.0,1.0,14.64,2.5,0.0,NaN,NaN,Manhattan,Upper East Side North,Yellow Zone,yellow
+2,2024-01-01T00:36:09.000000000,2024-01-01T01:08:16.000000000,1,2.88,Standard rate,N,Credit card,27.5,1.0,0.5,6.5,0.0,1.0,39.0,2.5,0.0,NaN,NaN,Manhattan,Kips Bay,Yellow Zone,yellow
+2,2024-01-01T00:46:16.000000000,2024-01-01T01:20:10.000000000,1,20.85,JFK,N,Credit card,70.0,0.0,0.5,0.0,6.94,1.0,82.69,2.5,1.75,NaN,NaN,Manhattan,Upper West Side South,Yellow Zone,yellow
+2,2024-01-01T00:14:52.000000000,2024-01-01T00:17:38.000000000,5,0.55,Standard rate,N,Credit card,5.1,1.0,0.5,1.52,0.0,1.0,11.62,2.5,0.0,NaN,NaN,Manhattan,Lincoln Square West,Yellow Zone,yellow
+2,2024-01-01T00:22:06.000000000,2024-01-01T00:51:28.000000000,5,3.1,Standard rate,N,Credit card,26.8,1.0,0.5,6.36,0.0,1.0,38.16,2.5,0.0,NaN,NaN,Manhattan,Murray Hill,Yellow Zone,yellow
+1,2024-01-01T00:27:23.000000000,2024-01-01T00:35:26.000000000,4,1.0,Standard rate,N,Credit card,9.3,3.5,0.5,5.0,0.0,1.0,19.3,2.5,0.0,NaN,NaN,Manhattan,Midtown Center,Yellow Zone,yellow
+1,2024-01-01T00:45:38.000000000,2024-01-01T01:01:57.000000000,2,1.8,Standard rate,N,Credit card,16.3,3.5,0.5,4.26,0.0,1.0,25.56,2.5,0.0,NaN,NaN,Manhattan,Upper East Side North,Yellow Zone,yellow
+2,2024-01-01T00:21:22.000000000,2024-01-01T00:45:26.000000000,1,1.88,Standard rate,N,Cash,20.5,1.0,0.5,0.0,0.0,1.0,25.5,2.5,0.0,NaN,NaN,Manhattan,Midtown East,Yellow Zone,yellow
+2,2024-01-01T00:52:30.000000000,2024-01-01T01:10:29.000000000,1,1.84,Standard rate,N,Credit card,16.3,1.0,0.5,5.33,0.0,1.0,26.63,2.5,0.0,NaN,NaN,Manhattan,Greenwich Village North,Yellow Zone,yellow
+2,2024-01-01T00:08:48.000000000,2024-01-01T00:09:33.000000000,1,0.05,Standard rate,N,Credit card,3.0,1.0,0.5,0.08,0.0,1.0,8.08,2.5,0.0,NaN,NaN,Manhattan,East Chelsea,Yellow Zone,yellow
+2,2024-01-01T00:33:59.000000000,2024-01-01T00:39:53.000000000,1,0.71,Standard rate,N,Credit card,7.2,1.0,0.5,3.66,0.0,1.0,15.86,2.5,0.0,NaN,NaN,Manhattan,Lincoln Square East,Yellow Zone,yellow
+1,2024-01-01T00:27:13.000000000,2024-01-01T00:29:51.000000000,2,0.2,Standard rate,N,Credit card,4.4,3.5,0.5,0.0,0.0,1.0,9.4,2.5,0.0,NaN,NaN,Manhattan,UN/Turtle Bay South,Yellow Zone,yellow
+1,2024-01-01T00:50:29.000000000,2024-01-01T01:42:04.000000000,4,2.3,Standard rate,N,Cash,40.1,3.5,0.5,0.0,0.0,1.0,45.1,2.5,0.0,NaN,NaN,Manhattan,Penn Station/Madison Sq West,Yellow Zone,yellow
+1,2024-01-01T00:54:24.000000000,2024-01-01T01:28:53.000000000,1,9.5,Standard rate,N,Credit card,44.3,3.5,0.5,9.85,0.0,1.0,59.15,2.5,0.0,NaN,NaN,Brooklyn,Park Slope,Boro Zone,yellow
+2,2024-01-01T00:27:02.000000000,2024-01-01T01:03:56.000000000,1,5.91,Standard rate,N,Credit card,35.2,1.0,0.5,8.04,0.0,1.0,48.24,2.5,0.0,NaN,NaN,Manhattan,Washington Heights South,Boro Zone,yellow
+2,2024-01-01T00:21:00.000000000,2024-01-01T00:46:17.000000000,1,1.51,Standard rate,N,Credit card,21.2,1.0,0.5,4.74,0.0,1.0,28.44,0.0,0.0,NaN,NaN,Manhattan,Clinton West,Yellow Zone,yellow
+2,2024-01-01T00:50:40.000000000,2024-01-01T01:13:44.000000000,1,1.11,Standard rate,N,Cash,20.5,1.0,0.5,0.0,0.0,1.0,23.0,0.0,0.0,NaN,NaN,Manhattan,UN/Turtle Bay South,Yellow Zone,yellow
+2,2024-01-01T00:07:59.000000000,2024-01-01T00:14:37.000000000,1,1.52,Standard rate,N,Credit card,9.3,1.0,0.5,2.86,0.0,1.0,17.16,2.5,0.0,NaN,NaN,Manhattan,Lenox Hill West,Yellow Zone,yellow
+2,2024-01-01T00:30:53.000000000,2024-01-01T00:40:38.000000000,1,3.04,Standard rate,N,Credit card,14.9,1.0,0.5,3.98,0.0,1.0,23.88,2.5,0.0,NaN,NaN,Manhattan,Lower East Side,Yellow Zone,yellow
+1,2024-01-01T00:20:39.000000000,2024-01-01T00:33:30.000000000,2,2.1,Standard rate,N,Credit card,12.8,3.5,0.5,0.0,0.0,1.0,17.8,2.5,0.0,NaN,NaN,Manhattan,Murray Hill,Yellow Zone,yellow
+2,2024-01-01T00:19:39.000000000,2024-01-01T00:41:38.000000000,1,1.55,Standard rate,N,Cash,19.1,1.0,0.5,0.0,0.0,1.0,24.1,2.5,0.0,NaN,NaN,Manhattan,Clinton West,Yellow Zone,yellow
+2,2024-01-01T00:42:43.000000000,2024-01-01T00:50:49.000000000,1,2.0,Standard rate,N,Credit card,10.7,1.0,0.5,3.14,0.0,1.0,18.84,2.5,0.0,NaN,NaN,Manhattan,Upper West Side North,Yellow Zone,yellow
+2,2024-01-01T00:54:16.000000000,2024-01-01T01:27:40.000000000,1,13.74,Standard rate,N,Credit card,56.9,1.0,0.5,13.77,6.94,1.0,82.61,2.5,0.0,NaN,NaN,Queens,Forest Hills,Boro Zone,yellow
+2,2024-01-01T00:13:58.000000000,2024-01-01T00:33:39.000000000,1,4.2,Standard rate,N,Credit card,21.9,1.0,0.5,5.38,0.0,1.0,32.28,2.5,0.0,NaN,NaN,Manhattan,Upper East Side South,Yellow Zone,yellow
+2,2024-01-01T00:35:53.000000000,2024-01-01T00:47:59.000000000,1,1.14,Standard rate,N,Credit card,11.4,1.0,0.5,3.28,0.0,1.0,19.68,2.5,0.0,NaN,NaN,Manhattan,UN/Turtle Bay South,Yellow Zone,yellow
+2,2024-01-01T00:50:28.000000000,2024-01-01T01:38:39.000000000,1,20.34,Standard rate,N,Credit card,80.0,1.0,0.5,2.0,0.0,1.0,86.25,0.0,1.75,NaN,NaN,Brooklyn,Borough Park,Boro Zone,yellow
+2,2024-01-01T00:18:24.000000000,2024-01-01T00:30:39.000000000,1,2.16,Standard rate,N,Dispute,-13.5,-1.0,-0.5,0.0,0.0,-1.0,-18.5,-2.5,0.0,NaN,NaN,Manhattan,Two Bridges/Seward Park,Yellow Zone,yellow
