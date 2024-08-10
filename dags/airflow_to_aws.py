@@ -125,6 +125,9 @@ def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str)
         columns += ", scraping_execution_date"
         insert_query = f"INSERT INTO {dataset_name} ({columns}) VALUES %s"
         records = [(tuple(row) + (datetime.now(),)) for row in df.to_numpy()]
+        
+        logger.info(f'Running insert query: {insert_query}')
+        
         extras.execute_values(cursor, insert_query, records)
         connection.commit()
 
