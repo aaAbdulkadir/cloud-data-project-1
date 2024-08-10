@@ -43,7 +43,7 @@ new_york_taxi:
         
     load_yellow: &load
       mode: append
-      dataset_name: new_york_taxi_data
+      dataset_name: new_york_taxi
       fields:
         - name: vendor_id
           type: INTEGER
