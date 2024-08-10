@@ -41,7 +41,7 @@ def transform(input_filename: str, output_filename: str, config: dict, params: d
     logger.info('Reading in dataframe')
     df = pl.read_parquet(input_filename)
     
-    # limiting the dataset as it is very large and expensive
+    # limiting the dataset as it is very large and expensive (using t2 server)
     df = df.head(100000)
 
     logger.info('Renaming column names')

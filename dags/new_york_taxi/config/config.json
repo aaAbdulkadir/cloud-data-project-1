@@ -25,7 +25,7 @@
             "VendorID": "vendor_id",
             "tpep_pickup_datetime": "pickup_datetime",
             "tpep_dropoff_datetime": "dropoff_datetime",
-            "RatecodeID": "ratecode_id",
+            "RatecodeID": "ratecode",
             "PULocationID": "pickup_location_id",
             "DOLocationID": "dropoff_location_id",
             "Airport_fee": "airport_fee"
@@ -58,7 +58,7 @@
             "VendorID": "vendor_id",
             "lpep_pickup_datetime": "pickup_datetime",
             "lpep_dropoff_datetime": "dropoff_datetime",
-            "RatecodeID": "ratecode_id",
+            "RatecodeID": "ratecode",
             "PULocationID": "pickup_location_id",
             "DOLocationID": "dropoff_location_id"
         }
@@ -69,7 +69,7 @@
         "dropoff_datetime",
         "passenger_count",
         "trip_distance",
-        "ratecode_id",
+        "ratecode",
         "store_and_fwd_flag",
         "pickup_location_id",
         "dropoff_location_id",
@@ -100,7 +100,7 @@
             "5": "Unknown",
             "6": "Voided trip"
         },
-        "ratecode_id": {
+        "ratecode": {
             "1": "Standard rate",
             "2": "JFK",
             "3": "Newark",

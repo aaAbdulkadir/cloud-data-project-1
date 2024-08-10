@@ -53,7 +53,7 @@ new_york_taxi:
           type: TIMESTAMP
         - name: store_and_fwd_flag
           type: VARCHAR(5)
-        - name: ratecode_id
+        - name: ratecode
           type: VARCHAR(40)
         - name: passenger_count
           type: INTEGER

@@ -1,4 +1,4 @@
-vendor_id,pickup_datetime,dropoff_datetime,store_and_fwd_flag,ratecode_id,passenger_count,trip_distance,fare_amount,extra,mta_tax,tip_amount,tolls_amount,ehail_fee,improvement_surcharge,total_amount,payment_type,trip_type,congestion_surcharge,airport_fee,borough,zone,service_zone,taxi_type
+vendor_id,pickup_datetime,dropoff_datetime,store_and_fwd_flag,ratecode,passenger_count,trip_distance,fare_amount,extra,mta_tax,tip_amount,tolls_amount,ehail_fee,improvement_surcharge,total_amount,payment_type,trip_type,congestion_surcharge,airport_fee,borough,zone,service_zone,taxi_type
 2,2024-05-01T00:07:08.000000000,2024-05-01T00:15:03.000000000,N,Standard rate,1,1.24,9.3,1.0,0.5,2.0,0.0,,1.0,13.8,Credit card,Street hail,0.0,NaN,Brooklyn,Clinton Hill,Boro Zone,green
 2,2024-05-01T00:30:48.000000000,2024-05-01T00:35:49.000000000,N,Standard rate,1,0.94,7.2,1.0,0.5,1.94,0.0,,1.0,11.64,Credit card,Street hail,0.0,NaN,Queens,Old Astoria,Boro Zone,green
 2,2024-05-01T00:34:13.000000000,2024-05-01T00:38:07.000000000,N,Standard rate,1,0.84,6.5,1.0,0.5,0.0,0.0,,1.0,9.0,Cash,Street hail,0.0,NaN,Manhattan,Central Harlem North,Boro Zone,green
