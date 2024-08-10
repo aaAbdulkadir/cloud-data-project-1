@@ -100,7 +100,7 @@ class TestDAGGenerator(TestBase):
     def test_create_dag(self, mock_variable):
         
         # Create the DAG using the provided create_dag function
-        dag = create_dag(self.dummy_dag_yml)
+        dag = create_dag('dags/new_york_taxi/new_york_taxi.yml')
         dag_bag = DagBag(dag_folder=self.dags_dir, include_examples=False)
         
         # Ensure the DAG was loaded successfully
@@ -108,7 +108,7 @@ class TestDAGGenerator(TestBase):
         self.assertFalse(dag_bag.import_errors)
 
         # Load the YAML configuration for comparison
-        dag_config = load_yml_file(self.dummy_dag_yml)['dummy_dag']
+        dag_config = load_yml_file('dags/new_york_taxi/new_york_taxi.yml')['dummy_dag']
 
         # Test DAG properties
         self.assertEqual(dag.schedule_interval, dag_config['schedule_interval'])

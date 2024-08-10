@@ -43,6 +43,7 @@ def transform(input_filename: str, output_filename: str, config: dict, params: d
 
     logger.info('Renaming column names')
     taxi_type = params['taxi_type']
+    logger.info(f'TAXI TYPE: {taxi_type}')
     df = df.rename(config[f'{taxi_type}_taxi']['columns_mappings'])
 
     logger.info('Filling in nan columns')

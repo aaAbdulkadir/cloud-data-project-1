@@ -22,21 +22,20 @@ AIRFLOW_HOME = '/home/ubuntu/airflow'
 STAGING_DATA = AIRFLOW_HOME + '/staging_data'
 
 
-def get_filename_template(dag_id: str, task_id: str, next_task_id: str, ts: str, file_extension: str) -> str:
+def get_filename_template(dag_id: str, task_id: str, ts: str, file_extension: str) -> str:
     """Gets the filename template for a given task. It formulates the filename
     based on the current task to the next task, with its timestamp and directory.
 
     Args:
         dag_id (str): The ID of the DAG.
         task_id (str): The ID of the current task.
-        next_task_id (str): The ID of the next task.
         ts (str): The timestamp of the task run.
         file_extension (str): The file extension of the output file.
 
     Returns:
         str: The formulated filename.
     """
-    return f"{dag_id}/{dag_id}_{task_id}_to_{next_task_id}_{ts}.{file_extension}"
+    return f"{dag_id}/{dag_id}_{task_id}_{ts}.{file_extension}"
 
 
 
@@ -109,7 +108,7 @@ def load_config_if_exists(scrape_dir_path: str, dag_params: dict) -> dict:
     return config
 
 
-def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
+def task_wrapper(task_function: Callable, **kwargs) -> None:
     """Wraps a task function to handle file staging, S3 interactions, and Airflow XCom.
 
     This wrapper handles the file paths, pulls necessary files from S3, executes
@@ -117,7 +116,6 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
 
     Args:
         task_function (Callable): The main task function to be executed.
-        next_task_id (str): The task ID of the next task in the DAG.
         **kwargs: Additional keyword arguments passed by Airflow.
 
     Keyword Args:
@@ -141,7 +139,7 @@ def task_wrapper(task_function: Callable, next_task_id: str, **kwargs) -> None:
     ts = kwargs['ts']
     file_extension = kwargs['file_extension']
 
-    output_filename = get_filename_template(dag_id, task_id, next_task_id, ts, file_extension)
+    output_filename = get_filename_template(dag_id, task_id, ts, file_extension)
     local_output_filepath = f"{STAGING_DATA}/{output_filename}"
         
     directory = f"{STAGING_DATA}/{dag_id}"
@@ -242,9 +240,7 @@ def create_dag(yml_file_path: str) -> DAG:
     with dag:
         tasks = {}
 
-        task_order = list(dag_params.get('tasks', {}).keys())
-
-        for idx, task_id in enumerate(task_order):
+        for task_id, task_params in dag_params.get('tasks', {}).items():
             task_params = dag_params['tasks'][task_id]
 
             if 'load' in task_id:
@@ -259,13 +255,15 @@ def create_dag(yml_file_path: str) -> DAG:
 
             args = {}
 
-            next_task_id = task_order[idx + 1] if idx + 1 < len(task_order) else ''
-            prev_task_id = task_order[idx - 1] if idx > 0 else None
+            next_task_id = '' 
+            # Get the previous task from dependencies
+            dependencies = task_params.get('dependencies', [])
+            prev_task_id = dependencies[0] if dependencies else None
 
             if 'extract' in task_id:
                 args.update({
                     'url': dag_params.get('url'),
-                    'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', file_extension),
+                    'output_filename': get_filename_template(dag_id, task_id, '{{ ts }}', file_extension),
                     'logical_timestamp': '{{ ts }}',
                     'config': config,
                     'params': task_params.get('params', {}),
@@ -281,7 +279,7 @@ def create_dag(yml_file_path: str) -> DAG:
             else:
                 args.update({
                     'input_filename': "{{ ti.xcom_pull(task_ids='" + prev_task_id + "', key='output_filename') }}",
-                    'output_filename': get_filename_template(dag_id, task_id, next_task_id, '{{ ts }}', file_extension),
+                    'output_filename': get_filename_template(dag_id, task_id, '{{ ts }}', file_extension),
                     'config': config,
                     'params': task_params.get('params', {}),
                     'file_extension': file_extension,
@@ -290,7 +288,7 @@ def create_dag(yml_file_path: str) -> DAG:
             task = PythonOperator(
                 task_id=task_id,
                 python_callable=task_wrapper,
-                op_kwargs={'task_function': python_callable, 'next_task_id': next_task_id, 'prev_task_id': prev_task_id, **args,},
+                op_kwargs={'task_function': python_callable, 'prev_task_id': prev_task_id, **args,},
                 retries=task_params.get('retries', 0),
                 retry_delay=timedelta(seconds=task_params.get('retry_delay', 15)),
                 provide_context=True,
@@ -302,5 +300,7 @@ def create_dag(yml_file_path: str) -> DAG:
             dependencies = task_params.get('dependencies', [])
             for dependency in dependencies:
                 tasks[dependency] >> tasks[task_id]
+                # Update next_task_id for the dependency task
+                tasks[dependency].op_kwargs['next_task_id'] = task_id
 
     return dag
