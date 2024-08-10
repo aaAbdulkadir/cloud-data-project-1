@@ -89,6 +89,8 @@ new_york_taxi:
           type: VARCHAR(70)
         - name: service_zone
           type: VARCHAR(40)
+        - name: taxi_type
+          type: VARCHAR(10)
       dependencies:
         - transform_yellow
 
