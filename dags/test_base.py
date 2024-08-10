@@ -123,7 +123,7 @@ class TestBase(unittest.TestCase):
                 self.verify_float_type(df, field_name)
             elif field_type == 'DATE':
                 self.verify_date_type(df, field_name)
-            elif field_type == 'DATETIME':
+            elif field_type == 'TIMESTAMP':
                 self.verify_datetime_type(df, field_name)
             else:
                 raise ValueError(f"Unsupported data type '{field_type}' for field '{field_name}'.")

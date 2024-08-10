@@ -48,9 +48,9 @@ new_york_taxi:
         - name: vendor_id
           type: INTEGER
         - name: pickup_datetime
-          type: DATETIME
+          type: TIMESTAMP
         - name: dropoff_datetime 
-          type: DATETIME
+          type: TIMESTAMP
         - name: store_and_fwd_flag
           type: VARCHAR(5)
         - name: ratecode_id
