@@ -114,7 +114,7 @@ def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str)
             field_name = field['name']
             field_type = field['type']
             create_table_query += f"{field_name} {field_type}, "
-        create_table_query += "scraping_execution_date timestamp);"
+        create_table_query += "scraping_execution_date TIMESTAMP);"
         
         logger.info(f'Running {mode} on query: {create_table_query}')
 
