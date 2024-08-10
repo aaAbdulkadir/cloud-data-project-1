@@ -89,6 +89,8 @@ def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str)
     port = "5432"  
 
     df = pd.read_csv(input_filename)
+    # order column names
+    df = df[[field['name'] for field in fields]]
 
     try:
         connection = psycopg2.connect(
