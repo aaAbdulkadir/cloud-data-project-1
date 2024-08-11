@@ -59,8 +59,11 @@ class TestBase(unittest.TestCase):
         mode = load_params['mode']
         dataset_name = load_params['dataset_name']
         fields = load_params['fields']
+        upsert_key_fields = load_params.get('upsert_key_fields', [])  # Get upsert_key_fields if present
         
         df = pd.read_csv(input_filename)
+        # order column names
+        df = df[[field['name'] for field in fields]]
         connection = sqlite3.connect(':memory:')  # In-memory SQLite database
         
         try:
@@ -73,8 +76,12 @@ class TestBase(unittest.TestCase):
                 cursor.execute(drop_table_query)
                 connection.commit()
                 create_table_query = f"CREATE TABLE {dataset_name} ("
+            elif mode == 'upsert':
+                if not upsert_key_fields:
+                    raise ValueError("upsert_key_fields must be provided for upsert mode.")
+                create_table_query = f"CREATE TABLE IF NOT EXISTS {dataset_name} ("
             else:
-                raise ValueError("Invalid mode. Choose 'append' or 'replace'.")
+                raise ValueError("Invalid mode. Choose 'append', 'replace', or 'upsert'.")
 
             for field in fields:
                 field_name = field['name']
@@ -90,12 +97,32 @@ class TestBase(unittest.TestCase):
             columns = ', '.join([field['name'] for field in fields])
             columns += ", scraping_execution_date"
             placeholders = ', '.join(['?' for _ in range(len(fields) + 1)])
-            insert_query = f"INSERT INTO {dataset_name} ({columns}) VALUES ({placeholders})"
-            records = [(tuple(row) + (datetime.now(),)) for row in df.to_numpy()]
-            cursor.executemany(insert_query, records)
+
+            if mode == 'upsert':
+                # Create a temporary table for the new data
+                temp_table_name = f"temp_{dataset_name}"
+                cursor.execute(f"CREATE TEMPORARY TABLE {temp_table_name} AS SELECT * FROM {dataset_name} WHERE 0")
+
+                # Insert data into the temporary table
+                insert_query = f"INSERT INTO {temp_table_name} ({columns}) VALUES ({placeholders})"
+                records = [(tuple(row) + (datetime.now(),)) for row in df.to_numpy()]
+                cursor.executemany(insert_query, records)
+
+                # Perform the upsert operation
+                upsert_query = f"""
+                    INSERT OR REPLACE INTO {dataset_name} ({columns})
+                    SELECT {columns} FROM {temp_table_name}
+                """
+                cursor.execute(upsert_query)
+                cursor.execute(f"DROP TABLE {temp_table_name}")
+
+            else:
+                insert_query = f"INSERT INTO {dataset_name} ({columns}) VALUES ({placeholders})"
+                records = [(tuple(row) + (datetime.now(),)) for row in df.to_numpy()]
+                cursor.executemany(insert_query, records)
+
             connection.commit()
             
-            # Validate data constraints
             self.validate_constraints(df, fields)
 
         except Exception as e:
@@ -125,6 +152,10 @@ class TestBase(unittest.TestCase):
                 self.verify_date_type(df, field_name)
             elif field_type == 'TIMESTAMP':
                 self.verify_datetime_type(df, field_name)
+            elif field_type == 'NUMERIC':
+                self.verify_numeric_type(df, field_name)
+            elif field_type == 'BIGINT':
+                self.verify_bigint_type(df, field_name)
             else:
                 raise ValueError(f"Unsupported data type '{field_type}' for field '{field_name}'.")
             # Add more type checks if needed
@@ -144,8 +175,31 @@ class TestBase(unittest.TestCase):
     def verify_float_type(self, df, field_name):
         """Verify FLOAT type constraints."""
         for value in df[field_name]:
-            if pd.notna(value) and not isinstance(value, float):
-                raise ValueError(f"Value '{value}' is not a float for field '{field_name}'.")
+            if pd.notna(value):
+                try:
+                    float(value)
+                except ValueError:
+                    raise ValueError(f"Value '{value}' is not a float for field '{field_name}'.")
+
+    def verify_numeric_type(self, df, field_name):
+        """Verify NUMERIC type constraints."""
+        for value in df[field_name]:
+            if pd.notna(value):
+                try:
+                    float(value)  # NUMERIC can include integer and float
+                except ValueError:
+                    raise ValueError(f"Value '{value}' is not a numeric value for field '{field_name}'.")
+
+    def verify_bigint_type(self, df, field_name):
+        """Verify BIGINT type constraints."""
+        for value in df[field_name]:
+            if pd.notna(value):
+                try:
+                    int_value = int(value)
+                    if not -2**63 <= int_value <= 2**63 - 1:
+                        raise ValueError(f"Value '{value}' is out of BIGINT range for field '{field_name}'.")
+                except ValueError:
+                    raise ValueError(f"Value '{value}' is not a valid BIGINT for field '{field_name}'.")
 
     def verify_date_type(self, df, field_name):
         """Verify DATE type constraints."""

@@ -62,7 +62,7 @@ def retrieve_from_s3(bucket: str, s3_key: str, local_file_path: str) -> None:
         raise AirflowException(f"Unexpected error: {str(e)}")
 
 
-def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str) -> None:
+def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str, upsert_key_fields: list = None) -> None:
     """Load data from a CSV file into a PostgreSQL database table.
 
     This function creates or replaces a table in the PostgreSQL database according
@@ -73,11 +73,14 @@ def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str)
         input_filename (str): The path to the input CSV file.
         fields (list): A list of dictionaries defining the table schema. Each dictionary
                        should contain 'name' and 'type' keys.
-        mode (str): The mode of table creation. Can be 'append' to add data to an existing table
-                    or 'replace' to create a new table, dropping the old one.
+        mode (str): The mode of table creation. Can be 'append' to add data to an existing table,
+                    'replace' to create a new table, dropping the old one, or 'upsert' to update
+                    existing records and insert new ones.
+        upsert_key_fields (list): A list of column names to use as the unique key for upsert operations.
+                                  Required when mode is 'upsert'.
     
     Raises:
-        ValueError: If an invalid mode is provided.
+        ValueError: If an invalid mode is provided or if upsert_key_fields is not provided for upsert mode.
         Exception: If any error occurs during database operations.
     """
     logger = logging.getLogger('load_to_rds')
@@ -109,8 +112,12 @@ def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str)
             cursor.execute(drop_table_query)
             connection.commit()
             create_table_query = f"CREATE TABLE {dataset_name} ("
+        elif mode == 'upsert':
+            if not upsert_key_fields:
+                raise ValueError("upsert_key_fields must be provided for upsert mode.")
+            create_table_query = f"CREATE TABLE IF NOT EXISTS {dataset_name} ("
         else:
-            raise ValueError("Invalid mode. Choose 'append' or 'replace'.")
+            raise ValueError("Invalid mode. Choose 'append', 'replace', or 'upsert'.")
 
         for field in fields:
             field_name = field['name']
@@ -125,12 +132,34 @@ def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str)
 
         columns = ', '.join([field['name'] for field in fields])
         columns += ", scraping_execution_date"
-        insert_query = f"INSERT INTO {dataset_name} ({columns}) VALUES %s"
-        records = [(tuple(row) + (datetime.now(),)) for row in df.to_numpy()]
-        
-        logger.info(f'Running insert query: {insert_query}')
-        
-        extras.execute_values(cursor, insert_query, records)
+
+        if mode == 'upsert':
+            temp_table_name = f"temp_{dataset_name}"
+            cursor.execute(f"CREATE TEMP TABLE {temp_table_name} (LIKE {dataset_name})")
+
+            insert_query = f"INSERT INTO {temp_table_name} ({columns}) VALUES %s"
+            records = [(tuple(row) + (datetime.now(),)) for row in df.to_numpy()]
+            
+            logger.info(f'Inserting data into temp table: {insert_query}')
+            extras.execute_values(cursor, insert_query, records)
+
+            upsert_query = f"""
+                INSERT INTO {dataset_name} ({columns})
+                SELECT {columns} FROM {temp_table_name}
+                ON CONFLICT ({', '.join(upsert_key_fields)}) DO UPDATE SET
+                {', '.join([f"{col} = EXCLUDED.{col}" for col in columns.split(', ') if col not in upsert_key_fields])}
+            """
+            
+            logger.info(f'Running upsert query: {upsert_query}')
+            cursor.execute(upsert_query)
+
+        else:
+            insert_query = f"INSERT INTO {dataset_name} ({columns}) VALUES %s"
+            records = [(tuple(row) + (datetime.now(),)) for row in df.to_numpy()]
+            
+            logger.info(f'Running insert query: {insert_query}')
+            extras.execute_values(cursor, insert_query, records)
+
         connection.commit()
 
     except Exception as e:

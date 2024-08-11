@@ -42,11 +42,17 @@ new_york_taxi:
         
         
     load_yellow: &load
-      mode: append
+      mode: upsert
       dataset_name: new_york_taxi
+      upsert_key_fields:
+        - vendor_id
+        - pickup_datetime
+        - dropoff_datetime
+        - zone
+        - service_zone
       fields:
         - name: vendor_id
-          type: INTEGER
+          type: NUMERIC
         - name: pickup_datetime
           type: TIMESTAMP
         - name: dropoff_datetime 
@@ -56,7 +62,7 @@ new_york_taxi:
         - name: ratecode
           type: VARCHAR(40)
         - name: passenger_count
-          type: INTEGER
+          type: NUMERIC
         - name: trip_distance
           type: FLOAT
         - name: fare_amount
