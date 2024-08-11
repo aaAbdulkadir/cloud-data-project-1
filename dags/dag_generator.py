@@ -274,10 +274,14 @@ def create_dag(yml_file_path: str) -> DAG:
                     'input_filename': "{{ ti.xcom_pull(task_ids='" + prev_task_id + "', key='output_filename') }}",
                     'mode': task_params.get('mode'),
                     'dataset_name': task_params.get('dataset_name'),
-                    'upsert_key_fields': task_params.get('upsert_key_fields', None),
                     'fields': task_params.get('fields'),
                     'file_extension': file_extension,
                 })
+                if task_params.get('mode') == 'upsert':
+                    upsert_key_fields = task_params.get('upsert_key_fields')
+                    if not upsert_key_fields:
+                        raise ValueError(f"upsert_key_fields must be provided for upsert mode in task {task_id}")
+                    args['upsert_key_fields'] = upsert_key_fields
             else:
                 args.update({
                     'input_filename': "{{ ti.xcom_pull(task_ids='" + prev_task_id + "', key='output_filename') }}",
