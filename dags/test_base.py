@@ -83,6 +83,7 @@ class TestBase(unittest.TestCase):
             else:
                 raise ValueError("Invalid mode. Choose 'append', 'replace', or 'upsert'.")
 
+
             for field in fields:
                 field_name = field['name']
                 field_type = field['type']
@@ -99,27 +100,40 @@ class TestBase(unittest.TestCase):
             placeholders = ', '.join(['?' for _ in range(len(fields) + 1)])
 
             if mode == 'upsert':
-                # Create a temporary table for the new data
                 temp_table_name = f"temp_{dataset_name}"
-                cursor.execute(f"CREATE TEMPORARY TABLE {temp_table_name} AS SELECT * FROM {dataset_name} WHERE 0")
+                cursor.execute(f"CREATE TEMP TABLE {temp_table_name} (LIKE {dataset_name})")
 
-                # Insert data into the temporary table
-                insert_query = f"INSERT INTO {temp_table_name} ({columns}) VALUES ({placeholders})"
+                insert_query = f"INSERT INTO {temp_table_name} ({columns}) VALUES %s"
                 records = [(tuple(row) + (datetime.now(),)) for row in df.to_numpy()]
-                cursor.executemany(insert_query, records)
+                
+                logger.info(f'Inserting data into temp table: {insert_query}')
+                cursor.execute(cursor, insert_query, records)
 
-                # Perform the upsert operation
+                # Build the WHERE clause to check for existing records
+                conflict_conditions = ' AND '.join(
+                    [f"{dataset_name}.{key} = {temp_table_name}.{key}" for key in upsert_key_fields]
+                )
+
                 upsert_query = f"""
-                    INSERT OR REPLACE INTO {dataset_name} ({columns})
+                    INSERT INTO {dataset_name} ({columns})
                     SELECT {columns} FROM {temp_table_name}
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM {dataset_name}
+                        WHERE {conflict_conditions}
+                    )
+                    ON CONFLICT ({', '.join(upsert_key_fields)}) DO UPDATE SET
+                    {', '.join([f"{col} = EXCLUDED.{col}" for col in columns.split(', ') if col not in upsert_key_fields])}
                 """
+                
+                logger.info(f'Running upsert query: {upsert_query}')
                 cursor.execute(upsert_query)
-                cursor.execute(f"DROP TABLE {temp_table_name}")
 
             else:
-                insert_query = f"INSERT INTO {dataset_name} ({columns}) VALUES ({placeholders})"
+                insert_query = f"INSERT INTO {dataset_name} ({columns}) VALUES %s"
                 records = [(tuple(row) + (datetime.now(),)) for row in df.to_numpy()]
-                cursor.executemany(insert_query, records)
+                
+                logger.info(f'Running insert query: {insert_query}')
+                extras.execute_values(cursor, insert_query, records)
 
             connection.commit()
             

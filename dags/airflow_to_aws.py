@@ -65,9 +65,6 @@ def retrieve_from_s3(bucket: str, s3_key: str, local_file_path: str) -> None:
 def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str, upsert_key_fields: list) -> None:
     """Load data from a CSV file into a PostgreSQL database table.
 
-    This function creates or replaces a table in the PostgreSQL database according
-    to the provided mode and loads data from the given CSV file into the table.
-
     Args:
         dataset_name (str): The name of the database table to load the data into.
         input_filename (str): The path to the input CSV file.
@@ -143,9 +140,18 @@ def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str,
             logger.info(f'Inserting data into temp table: {insert_query}')
             extras.execute_values(cursor, insert_query, records)
 
+            # Build the WHERE clause to check for existing records
+            conflict_conditions = ' AND '.join(
+                [f"{dataset_name}.{key} = {temp_table_name}.{key}" for key in upsert_key_fields]
+            )
+
             upsert_query = f"""
                 INSERT INTO {dataset_name} ({columns})
                 SELECT {columns} FROM {temp_table_name}
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM {dataset_name}
+                    WHERE {conflict_conditions}
+                )
                 ON CONFLICT ({', '.join(upsert_key_fields)}) DO UPDATE SET
                 {', '.join([f"{col} = EXCLUDED.{col}" for col in columns.split(', ') if col not in upsert_key_fields])}
             """
