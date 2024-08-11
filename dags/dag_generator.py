@@ -169,6 +169,7 @@ def task_wrapper(task_function: Callable, **kwargs) -> None:
             task_args['params'] = kwargs['params']
     elif 'load' in task_id:
         task_args['dataset_name'] = kwargs['dataset_name']
+        task_args['upsert_key_fields'] = kwargs['upsert_key_fields']
         task_args['input_filename'] = input_local_filepath
         task_args['mode'] = kwargs['mode']
         task_args['fields'] = kwargs['fields']

@@ -62,7 +62,7 @@ def retrieve_from_s3(bucket: str, s3_key: str, local_file_path: str) -> None:
         raise AirflowException(f"Unexpected error: {str(e)}")
 
 
-def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str, upsert_key_fields: list = None) -> None:
+def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str, upsert_key_fields: list) -> None:
     """Load data from a CSV file into a PostgreSQL database table.
 
     This function creates or replaces a table in the PostgreSQL database according

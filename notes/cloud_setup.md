@@ -5,7 +5,7 @@
 
 ## Setting up IAM
 
-The first thing to do is to set up an IAM user group and user so that you can enable the bare minimum permisssions needed to get this project running, following best practices. The user group that will be created is for a developer that is able to read and write to the s3 buckets and RDS database. The following series of steps will be done in the root user.
+To follow best practices, the first step is to configure an IAM user group and user with the minimum necessary permissions to run this project. The IAM user group will have permissions to read and write to S3 buckets, interact with the EC2 instance, and access the RDS database. The following steps will be performed under the root user.
 
 
 **Permissions needed for this project**:
@@ -474,12 +474,19 @@ GitHub actions pipeline needs to:
 - Secrets and variables > Actions > New repository secret
 
 - Add the following variables in secrets to ensure the pipeline can run the aws services as intended
+
     - AWS_ACCESS_KEY_ID: Your AWS access key ID.
+
     - AWS_SECRET_ACCESS_KEY: Your AWS secret access key.
+
     - AWS_REGION: The AWS region where your S3 bucket is located.
+
     - S3_BUCKET: The name of your S3 bucket.
+
     - EC2_INSTANCE: The public DNS or IP address of your EC2 instance (better yet use the elastic ip address so it does not change. If set up, it will do it automatically)
+
     - SSH_PRIVATE_KEY: Your EC2 instance's SSH private key.
+
     - EC2_USER: The username for SSH access to your EC2 instance.
 
 
