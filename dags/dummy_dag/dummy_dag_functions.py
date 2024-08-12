@@ -46,7 +46,7 @@ def extract_2(
     logger.info(params)
 
     with open(output_filename, 'w') as f:
-        f.write('Testing,1,animal')
+        f.write('Testing,1,animals')
 
 def transform(input_filename: str, output_filename: str) -> None:
     """Dummy transform for testing purposes.
