@@ -26,7 +26,7 @@ def extract(
     logger.info(params)
 
     with open(output_filename, 'w') as f:
-        f.write('Testing,1,animals')
+        f.write('Testing,1,cat')
 
 def extract_2(
     url: str,
