@@ -237,6 +237,7 @@ def task_wrapper(task_function: Callable, **kwargs) -> None:
             raise AirflowException('Cannot extract previously extracted filename')
         elif latest_s3_key is None:
             logger.info('No latest file found in S3 bucket, skipping the comparison check.')
+            latest_file_comparison_check = False
         
         latest_file_comparison_check = kwargs['latest_file_comparison_check']
         if latest_file_comparison_check:
