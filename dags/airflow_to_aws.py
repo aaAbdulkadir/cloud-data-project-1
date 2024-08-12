@@ -83,7 +83,7 @@ def get_latest_file_from_s3(bucket: str, dag_id: str, task_id: str) -> str:
     try:
         s3 = boto3.client('s3')
         prefix = f"{dag_id}/{dag_id}_{task_id}"
-        objects = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
+        objects = s3.list_objects_v2(Bucket=bucket, Prefix=prefix)
         if 'Contents' not in objects:
             return None
 
