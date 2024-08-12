@@ -231,6 +231,7 @@ def task_wrapper(task_function: Callable, **kwargs) -> None:
     
     # Latest file comparison check after extract # previously extracted file if file name is same
     if 'extract' in task_id:
+        latest_file_comparison_check = kwargs['latest_file_comparison_check']
         latest_s3_key = get_latest_file_from_s3(bucket=S3_STAGING_BUCKET, dag_id=dag_id, task_id=task_id)
         
         if latest_s3_key == local_output_filepath:
@@ -239,7 +240,6 @@ def task_wrapper(task_function: Callable, **kwargs) -> None:
             logger.info('No latest file found in S3 bucket, skipping the comparison check.')
             latest_file_comparison_check = False
         
-        latest_file_comparison_check = kwargs['latest_file_comparison_check']
         if latest_file_comparison_check:
             logger.info('Carrying out latest file comparison check')
             latest_local_file_path = f"{STAGING_DATA}/{latest_s3_key.split('/')[-1]}"
