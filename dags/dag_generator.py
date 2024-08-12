@@ -155,10 +155,12 @@ def read_in_data(filename: str) -> pl.DataFrame:
 
 
 def task_wrapper(task_function: Callable, **kwargs) -> None:
-    """Wraps a task function to handle file staging, S3 interactions, and Airflow XCom.
+    """
+    Wraps a task function to handle file staging, S3 interactions, and Airflow XCom.
 
-    This wrapper handles the file paths, pulls necessary files from S3, executes
-    the given task function, and pushes the output filename to XCom for downstream tasks.
+    This wrapper manages file paths, retrieves necessary files from S3, executes
+    the given task function, optionally compares the output with the latest file
+    from S3, and pushes the output filename to XCom for downstream tasks.
 
     Args:
         task_function (Callable): The main task function to be executed.
@@ -176,7 +178,22 @@ def task_wrapper(task_function: Callable, **kwargs) -> None:
         dataset_name (str): The name of the dataset for the load task.
         mode (str): The mode (append/replace) for the load task.
         fields (list): The key fields for the load task.
-    """ 
+        file_extension (str): The file extension for the output file.
+        latest_file_comparison_check (bool): Whether to perform a comparison with
+            the latest file in the S3 bucket during the extract task.
+
+    Raises:
+        AirflowException: If attempting to extract a previously extracted filename.
+        
+    Workflow:
+        - Determines file paths and S3 keys based on task details.
+        - Pulls the previous task's output file from S3 if the current task is not an 'extract' task.
+        - Constructs arguments for the provided `task_function` based on the task type.
+        - Calls the provided `task_function` with the constructed arguments.
+        - If the task is an 'extract' task, optionally compares the new file with the latest one from S3.
+        - Uploads the output file to S3 if the task is not a 'load' task.
+        - Pushes the output filename to XCom for downstream tasks.
+    """
     logger = logging.getLogger('Task wrapper')
     
     ti = kwargs['ti']
@@ -255,7 +272,6 @@ def task_wrapper(task_function: Callable, **kwargs) -> None:
         upload_to_s3(local_file_path=local_output_filepath, bucket=S3_STAGING_BUCKET, s3_key=s3_key)
         logger.info(f'Removed {input_local_filepath}')
         os.remove(input_local_filepath)
-        os.remove(local_output_filepath)
         
     ti.xcom_push(key='output_filename', value=output_filename)
     
