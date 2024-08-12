@@ -10,7 +10,7 @@ from airflow.models import Variable
 from typing import Callable
 import logging
 import inspect
-import pandas as pd
+import polars as pl
 from airflow.exceptions import AirflowSkipException, AirflowException
 from airflow_to_aws import (
     upload_to_s3,
@@ -109,26 +109,49 @@ def load_config_if_exists(scrape_dir_path: str, dag_params: dict) -> dict:
     return config
 
 
-def check_two_dataframes(df_1: pd.DataFrame, df_2: pd.DataFrame) -> bool:
+def check_two_dataframes(df_1: pl.DataFrame, df_2: pl.DataFrame) -> bool:
     """Compares two dataframes and checks if they are identical.
 
     Args:
-        df_1 (pd.DataFrame): The newly extracted dataframe.
-        df_2 (pd.DataFrame): The previously extracted dataframe.
+        df_1 (pl.DataFrame): The newly extracted dataframe.
+        df_2 (pl.DataFrame): The previously extracted dataframe.
 
     Returns:
         bool: True if the dataframes are different, False if they are the same.
     """
     cols_sorted = sorted(df_1.columns)
-    df_1 = df_1[cols_sorted].sort_values(by=cols_sorted)
-    df_2 = df_2[cols_sorted].sort_values(by=cols_sorted)
+    df_1 = df_1.select(cols_sorted).sort(cols_sorted)
+    df_2 = df_2.select(cols_sorted).sort(cols_sorted)
     
-    if df_1.equals(df_2):
+    if df_1.frame_equal(df_2):
         raise AirflowSkipException(
             'Extracted file is the same as the previously extracted file, skipping.'
         )
     else:
         return True
+    
+
+def read_in_data(filename: str) -> pl.DataFrame:
+    """Reads in data from a file and returns it as a Polars DataFrame.
+
+    Args:
+        filename (str): The path to the file.
+
+    Raises:
+        AirflowException: If the file format is unsupported.
+
+    Returns:
+        pl.DataFrame: The data as a Polars DataFrame.
+    """
+    extension = filename.split('.')[-1]
+    if extension == 'csv':
+        return pl.read_csv(filename)
+    elif extension in ['xlsx', 'xls']:
+        return pl.read_excel(filename)
+    elif extension == 'parquet':
+        return pl.read_parquet(filename)
+    else:
+        raise AirflowException(f"Unsupported file format: {extension}")
 
 
 def task_wrapper(task_function: Callable, **kwargs) -> None:
@@ -219,8 +242,9 @@ def task_wrapper(task_function: Callable, **kwargs) -> None:
                 latest_local_file_path = f"{STAGING_DATA}/{latest_s3_key.split('/')[-1]}"
                 retrieve_from_s3(bucket=S3_STAGING_BUCKET, s3_key=latest_s3_key, local_file_path=latest_local_file_path)
                 # Implement file comparison logic
-                df_1 = pd.read_csv(local_output_filepath)
-                df_2 = pd.read_csv(latest_local_file_path)
+                
+                df_1 = read_in_data(local_output_filepath)
+                df_2 = read_in_data(latest_local_file_path)
                 if check_two_dataframes(df_1, df_2):
                     os.remove(latest_local_file_path)
                     
