@@ -2,6 +2,7 @@ dummy_dag:
   owner: Abdulkadir
   description: dummy dag
   schedule_interval: '0 9 * * *'
+  start_date: 2024-01-01
   url: https://www.google.com
 
   email_on_failure: True
