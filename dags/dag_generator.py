@@ -266,12 +266,11 @@ def task_wrapper(task_function: Callable, **kwargs) -> None:
             df_2 = read_in_data(latest_local_file_path)
             if check_two_dataframes(df_1, df_2):
                 os.remove(latest_local_file_path)
+                
                     
     # Upload output file to S3 staging bucket
     if 'load' not in task_id:
         upload_to_s3(local_file_path=local_output_filepath, bucket=S3_STAGING_BUCKET, s3_key=s3_key)
-        logger.info(f'Removed {input_local_filepath}')
-        os.remove(input_local_filepath)
         
     ti.xcom_push(key='output_filename', value=output_filename)
     
