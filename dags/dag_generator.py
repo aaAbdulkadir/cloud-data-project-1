@@ -231,23 +231,23 @@ def task_wrapper(task_function: Callable, **kwargs) -> None:
     
     # Latest file comparison check after extract # previously extracted file if file name is same
     if 'extract' in task_id:
+        latest_s3_key = get_latest_file_from_s3(bucket=S3_STAGING_BUCKET, dag_id=dag_id, task_id=task_id)
+        
+        if latest_s3_key == local_output_filepath:
+            raise AirflowException('Cannot extract previously extracted filename')
+        elif latest_s3_key is None:
+            logger.info('No latest file found in S3 bucket, skipping the comparison check.')
+        
         latest_file_comparison_check = kwargs['latest_file_comparison_check']
         if latest_file_comparison_check:
             logger.info('Carrying out latest file comparison check')
-            latest_s3_key = get_latest_file_from_s3(bucket=S3_STAGING_BUCKET, dag_id=dag_id, task_id=task_id)
-            if latest_s3_key is None:
-                logger.info('No latest file found in S3 bucket, skipping the comparison check.')
-            elif latest_s3_key == local_output_filepath:
-                raise AirflowException('Cannot extract previously extracted filename')
-            else:
-                latest_local_file_path = f"{STAGING_DATA}/{latest_s3_key.split('/')[-1]}"
-                retrieve_from_s3(bucket=S3_STAGING_BUCKET, s3_key=latest_s3_key, local_file_path=latest_local_file_path)
-                # Implement file comparison logic
-                
-                df_1 = read_in_data(local_output_filepath)
-                df_2 = read_in_data(latest_local_file_path)
-                if check_two_dataframes(df_1, df_2):
-                    os.remove(latest_local_file_path)
+            latest_local_file_path = f"{STAGING_DATA}/{latest_s3_key.split('/')[-1]}"
+            retrieve_from_s3(bucket=S3_STAGING_BUCKET, s3_key=latest_s3_key, local_file_path=latest_local_file_path)
+            
+            df_1 = read_in_data(local_output_filepath)
+            df_2 = read_in_data(latest_local_file_path)
+            if check_two_dataframes(df_1, df_2):
+                os.remove(latest_local_file_path)
                     
     # Upload output file to S3 staging bucket
     if 'load' not in task_id:

@@ -16,6 +16,7 @@ dummy_dag:
     extract:
       python_callable: extract
       file_extension: csv
+      latest_file_comparison_check: True
       retries: 3
       retry_delay: 1200
       params:
