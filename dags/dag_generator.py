@@ -192,7 +192,6 @@ def task_wrapper(task_function: Callable, **kwargs) -> None:
             task_args['params'] = kwargs['params']
     elif 'load' in task_id:
         task_args['dataset_name'] = kwargs['dataset_name']
-        task_args['upsert_key_fields'] = kwargs['upsert_key_fields']
         task_args['input_filename'] = input_local_filepath
         task_args['mode'] = kwargs['mode']
         task_args['fields'] = kwargs['fields']
@@ -316,11 +315,6 @@ def create_dag(yml_file_path: str) -> DAG:
                     'fields': task_params.get('fields'),
                     'file_extension': file_extension,
                 })
-                if task_params.get('mode') == 'upsert':
-                    upsert_key_fields = task_params.get('upsert_key_fields')
-                    if not upsert_key_fields:
-                        raise ValueError(f"upsert_key_fields must be provided for upsert mode in task {task_id}")
-                    args['upsert_key_fields'] = upsert_key_fields
             else:
                 args.update({
                     'input_filename': "{{ ti.xcom_pull(task_ids='" + prev_task_id + "', key='output_filename') }}",
