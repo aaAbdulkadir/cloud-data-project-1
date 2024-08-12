@@ -123,7 +123,7 @@ def check_two_dataframes(df_1: pl.DataFrame, df_2: pl.DataFrame) -> bool:
     df_1 = df_1.select(cols_sorted).sort(cols_sorted)
     df_2 = df_2.select(cols_sorted).sort(cols_sorted)
     
-    if df_1.frame_equal(df_2):
+    if df_1.equals(df_2):
         raise AirflowSkipException(
             'Extracted file is the same as the previously extracted file, skipping.'
         )
@@ -233,6 +233,7 @@ def task_wrapper(task_function: Callable, **kwargs) -> None:
     if 'extract' in task_id:
         latest_file_comparison_check = kwargs['latest_file_comparison_check']
         if latest_file_comparison_check:
+            logger.info('Carrying out latest file comparison check')
             latest_s3_key = get_latest_file_from_s3(bucket=S3_STAGING_BUCKET, dag_id=dag_id, task_id=task_id)
             if latest_s3_key is None:
                 logger.info('No latest file found in S3 bucket, skipping the comparison check.')
