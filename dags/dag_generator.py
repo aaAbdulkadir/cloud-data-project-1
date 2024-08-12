@@ -10,11 +10,13 @@ from airflow.models import Variable
 from typing import Callable
 import logging
 import inspect
-
+import pandas as pd
+from airflow.exceptions import AirflowSkipException, AirflowException
 from airflow_to_aws import (
     upload_to_s3,
     retrieve_from_s3,
     load_to_rds,
+    get_latest_file_from_s3
 )
 
 S3_STAGING_BUCKET = Variable.get("S3_STAGING_BUCKET", '')
@@ -96,8 +98,7 @@ def load_config_if_exists(scrape_dir_path: str, dag_params: dict) -> dict:
         dict: The loaded configuration as a dictionary. If no configuration file is found, 
               an empty dictionary is returned.
     """
-    logger = logging.getLogger('Load config if exists'
-                               )
+    logger = logging.getLogger('Load config if exists')
     if 'config_path' in dag_params:
         logger.info('config_path exists in yml file')
         config_path = os.path.join(scrape_dir_path, dag_params['config_path'])
@@ -106,6 +107,28 @@ def load_config_if_exists(scrape_dir_path: str, dag_params: dict) -> dict:
         logger.info('config_path does not exist in yml file')
         config = {}
     return config
+
+
+def check_two_dataframes(df_1: pd.DataFrame, df_2: pd.DataFrame) -> bool:
+    """Compares two dataframes and checks if they are identical.
+
+    Args:
+        df_1 (pd.DataFrame): The newly extracted dataframe.
+        df_2 (pd.DataFrame): The previously extracted dataframe.
+
+    Returns:
+        bool: True if the dataframes are different, False if they are the same.
+    """
+    cols_sorted = sorted(df_1.columns)
+    df_1 = df_1[cols_sorted].sort_values(by=cols_sorted)
+    df_2 = df_2[cols_sorted].sort_values(by=cols_sorted)
+    
+    if df_1.equals(df_2):
+        raise AirflowSkipException(
+            'Extracted file is the same as the previously extracted file, skipping.'
+        )
+    else:
+        return True
 
 
 def task_wrapper(task_function: Callable, **kwargs) -> None:
@@ -183,16 +206,31 @@ def task_wrapper(task_function: Callable, **kwargs) -> None:
         
     # Call the main Python callable with the constructed arguments
     task_function(**task_args)
-        
+    
+    # Latest file comparison check after extract # previously extracted file if file name is same
+    if 'extract' in task_id:
+        latest_file_comparison_check = kwargs['latest_file_comparison_check']
+        if latest_file_comparison_check:
+            latest_s3_key = get_latest_file_from_s3(bucket=S3_STAGING_BUCKET, dag_id=dag_id, task_id=task_id)
+            if latest_s3_key is None:
+                logger.info('No latest file found in S3 bucket, skipping the comparison check.')
+            elif latest_s3_key == local_output_filepath:
+                raise AirflowException('Cannot extract previously extracted filename')
+            else:
+                latest_local_file_path = f"{STAGING_DATA}/{latest_s3_key.split('/')[-1]}"
+                retrieve_from_s3(bucket=S3_STAGING_BUCKET, s3_key=latest_s3_key, local_file_path=latest_local_file_path)
+                # Implement file comparison logic
+                df_1 = pd.read_csv(local_output_filepath)
+                df_2 = pd.read_csv(latest_local_file_path)
+                if check_two_dataframes(df_1, df_2):
+                    os.remove(latest_local_file_path)
+                    
     # Upload output file to S3 staging bucket
     if 'load' not in task_id:
         upload_to_s3(local_file_path=local_output_filepath, bucket=S3_STAGING_BUCKET, s3_key=s3_key)
-        
-    # after downloading the fiel from s3
-    if 'extract' not in task_id:
         logger.info(f'Removed {input_local_filepath}')
         os.remove(input_local_filepath)
-        
+        os.remove(local_output_filepath)
         
     ti.xcom_push(key='output_filename', value=output_filename)
     
@@ -256,7 +294,6 @@ def create_dag(yml_file_path: str) -> DAG:
 
             args = {}
 
-            next_task_id = '' 
             # Get the previous task from dependencies
             dependencies = task_params.get('dependencies', [])
             prev_task_id = dependencies[0] if dependencies else None
@@ -269,6 +306,7 @@ def create_dag(yml_file_path: str) -> DAG:
                     'config': config,
                     'params': task_params.get('params', {}),
                     'file_extension': file_extension,
+                    'latest_file_comparison_check': task_params.get('latest_file_comparison_check', False),
                 })
             elif 'load' in task_id:
                 args.update({

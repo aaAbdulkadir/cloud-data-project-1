@@ -59,11 +59,8 @@ class TestBase(unittest.TestCase):
         mode = load_params['mode']
         dataset_name = load_params['dataset_name']
         fields = load_params['fields']
-        upsert_key_fields = load_params.get('upsert_key_fields', [])  # Get upsert_key_fields if present
         
         df = pd.read_csv(input_filename)
-        # order column names
-        df = df[[field['name'] for field in fields]]
         connection = sqlite3.connect(':memory:')  # In-memory SQLite database
         
         try:
@@ -76,13 +73,8 @@ class TestBase(unittest.TestCase):
                 cursor.execute(drop_table_query)
                 connection.commit()
                 create_table_query = f"CREATE TABLE {dataset_name} ("
-            elif mode == 'upsert':
-                if not upsert_key_fields:
-                    raise ValueError("upsert_key_fields must be provided for upsert mode.")
-                create_table_query = f"CREATE TABLE IF NOT EXISTS {dataset_name} ("
             else:
-                raise ValueError("Invalid mode. Choose 'append', 'replace', or 'upsert'.")
-
+                raise ValueError("Invalid mode. Choose 'append' or 'replace'.")
 
             for field in fields:
                 field_name = field['name']
@@ -98,45 +90,12 @@ class TestBase(unittest.TestCase):
             columns = ', '.join([field['name'] for field in fields])
             columns += ", scraping_execution_date"
             placeholders = ', '.join(['?' for _ in range(len(fields) + 1)])
-
-            if mode == 'upsert':
-                temp_table_name = f"temp_{dataset_name}"
-                cursor.execute(f"CREATE TEMP TABLE {temp_table_name} (LIKE {dataset_name})")
-
-                insert_query = f"INSERT INTO {temp_table_name} ({columns}) VALUES %s"
-                records = [(tuple(row) + (datetime.now(),)) for row in df.to_numpy()]
-                
-                logger.info(f'Inserting data into temp table: {insert_query}')
-                cursor.execute(cursor, insert_query, records)
-
-                # Build the WHERE clause to check for existing records
-                conflict_conditions = ' AND '.join(
-                    [f"{dataset_name}.{key} = {temp_table_name}.{key}" for key in upsert_key_fields]
-                )
-
-                upsert_query = f"""
-                    INSERT INTO {dataset_name} ({columns})
-                    SELECT {columns} FROM {temp_table_name}
-                    WHERE NOT EXISTS (
-                        SELECT 1 FROM {dataset_name}
-                        WHERE {conflict_conditions}
-                    )
-                    ON CONFLICT ({', '.join(upsert_key_fields)}) DO UPDATE SET
-                    {', '.join([f"{col} = EXCLUDED.{col}" for col in columns.split(', ') if col not in upsert_key_fields])}
-                """
-                
-                logger.info(f'Running upsert query: {upsert_query}')
-                cursor.execute(upsert_query)
-
-            else:
-                insert_query = f"INSERT INTO {dataset_name} ({columns}) VALUES %s"
-                records = [(tuple(row) + (datetime.now(),)) for row in df.to_numpy()]
-                
-                logger.info(f'Running insert query: {insert_query}')
-                extras.execute_values(cursor, insert_query, records)
-
+            insert_query = f"INSERT INTO {dataset_name} ({columns}) VALUES ({placeholders})"
+            records = [(tuple(row) + (datetime.now(),)) for row in df.to_numpy()]
+            cursor.executemany(insert_query, records)
             connection.commit()
             
+            # Validate data constraints
             self.validate_constraints(df, fields)
 
         except Exception as e:

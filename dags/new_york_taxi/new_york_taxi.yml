@@ -17,6 +17,7 @@ new_york_taxi:
     extract_yellow: &extract
       python_callable: extract
       file_extension: parquet
+      latest_file_comparison_check: True
       params:
         taxi_type: yellow
 
@@ -42,14 +43,8 @@ new_york_taxi:
         
         
     load_yellow: &load
-      mode: upsert
+      mode: append
       dataset_name: new_york_taxi
-      upsert_key_fields:
-        - vendor_id
-        - pickup_datetime
-        - dropoff_datetime
-        - zone
-        - service_zone
       fields:
         - name: vendor_id
           type: NUMERIC

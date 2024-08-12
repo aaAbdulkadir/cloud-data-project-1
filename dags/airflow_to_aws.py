@@ -62,22 +62,57 @@ def retrieve_from_s3(bucket: str, s3_key: str, local_file_path: str) -> None:
         raise AirflowException(f"Unexpected error: {str(e)}")
 
 
-def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str, upsert_key_fields: list) -> None:
+def get_latest_file_from_s3(bucket_name: str, dag_id: str, task_id: str) -> str:
+    """
+    Retrieve the latest file from an S3 bucket using a prefix that is constructed 
+    based on the DAG ID and Task ID. This function helps to ensure that each task 
+    within a DAG retrieves its own respective files without any overlap.
+
+    Args:
+        bucket_name (str): The name of the S3 bucket to search.
+        dag_id (str): The ID of the DAG running the task.
+        task_id (str): The ID of the task within the DAG.
+
+    Returns:
+        str: The key (path) of the latest file in the S3 bucket that matches the 
+             specified prefix. If no files are found, returns None.
+
+    Raises:
+        AirflowException: If an unexpected error occurs during the S3 operation.
+    """
+    try:
+        s3 = boto3.client('s3')
+        prefix = f"{dag_id}/{dag_id}_{task_id}"
+        objects = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
+        if 'Contents' not in objects:
+            return None
+
+        # Sort the objects by LastModified in descending order
+        sorted_objects = sorted(objects['Contents'], key=lambda obj: obj['LastModified'], reverse=True)
+        
+        # Return the key of the latest object
+        return sorted_objects[0]['Key'] if sorted_objects else None
+
+    except Exception as e:
+        raise AirflowException(f"Unexpected error: {str(e)}")
+    
+
+def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str) -> None:
     """Load data from a CSV file into a PostgreSQL database table.
+
+    This function creates or replaces a table in the PostgreSQL database according
+    to the provided mode and loads data from the given CSV file into the table.
 
     Args:
         dataset_name (str): The name of the database table to load the data into.
         input_filename (str): The path to the input CSV file.
         fields (list): A list of dictionaries defining the table schema. Each dictionary
                        should contain 'name' and 'type' keys.
-        mode (str): The mode of table creation. Can be 'append' to add data to an existing table,
-                    'replace' to create a new table, dropping the old one, or 'upsert' to update
-                    existing records and insert new ones.
-        upsert_key_fields (list): A list of column names to use as the unique key for upsert operations.
-                                  Required when mode is 'upsert'.
+        mode (str): The mode of table creation. Can be 'append' to add data to an existing table
+                    or 'replace' to create a new table, dropping the old one.
     
     Raises:
-        ValueError: If an invalid mode is provided or if upsert_key_fields is not provided for upsert mode.
+        ValueError: If an invalid mode is provided.
         Exception: If any error occurs during database operations.
     """
     logger = logging.getLogger('load_to_rds')
@@ -109,12 +144,8 @@ def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str,
             cursor.execute(drop_table_query)
             connection.commit()
             create_table_query = f"CREATE TABLE {dataset_name} ("
-        elif mode == 'upsert':
-            if not upsert_key_fields:
-                raise ValueError("upsert_key_fields must be provided for upsert mode.")
-            create_table_query = f"CREATE TABLE IF NOT EXISTS {dataset_name} ("
         else:
-            raise ValueError("Invalid mode. Choose 'append', 'replace', or 'upsert'.")
+            raise ValueError("Invalid mode. Choose 'append' or 'replace'.")
 
         for field in fields:
             field_name = field['name']
@@ -129,43 +160,12 @@ def load_to_rds(dataset_name: str, input_filename: str, fields: list, mode: str,
 
         columns = ', '.join([field['name'] for field in fields])
         columns += ", scraping_execution_date"
-
-        if mode == 'upsert':
-            temp_table_name = f"temp_{dataset_name}"
-            cursor.execute(f"CREATE TEMP TABLE {temp_table_name} (LIKE {dataset_name})")
-
-            insert_query = f"INSERT INTO {temp_table_name} ({columns}) VALUES %s"
-            records = [(tuple(row) + (datetime.now(),)) for row in df.to_numpy()]
-            
-            logger.info(f'Inserting data into temp table: {insert_query}')
-            extras.execute_values(cursor, insert_query, records)
-
-            # Build the WHERE clause to check for existing records
-            conflict_conditions = ' AND '.join(
-                [f"{dataset_name}.{key} = {temp_table_name}.{key}" for key in upsert_key_fields]
-            )
-
-            upsert_query = f"""
-                INSERT INTO {dataset_name} ({columns})
-                SELECT {columns} FROM {temp_table_name}
-                WHERE NOT EXISTS (
-                    SELECT 1 FROM {dataset_name}
-                    WHERE {conflict_conditions}
-                )
-                ON CONFLICT ({', '.join(upsert_key_fields)}) DO UPDATE SET
-                {', '.join([f"{col} = EXCLUDED.{col}" for col in columns.split(', ') if col not in upsert_key_fields])}
-            """
-            
-            logger.info(f'Running upsert query: {upsert_query}')
-            cursor.execute(upsert_query)
-
-        else:
-            insert_query = f"INSERT INTO {dataset_name} ({columns}) VALUES %s"
-            records = [(tuple(row) + (datetime.now(),)) for row in df.to_numpy()]
-            
-            logger.info(f'Running insert query: {insert_query}')
-            extras.execute_values(cursor, insert_query, records)
-
+        insert_query = f"INSERT INTO {dataset_name} ({columns}) VALUES %s"
+        records = [(tuple(row) + (datetime.now(),)) for row in df.to_numpy()]
+        
+        logger.info(f'Running insert query: {insert_query}')
+        
+        extras.execute_values(cursor, insert_query, records)
         connection.commit()
 
     except Exception as e:
