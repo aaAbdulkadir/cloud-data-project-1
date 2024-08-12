@@ -62,14 +62,14 @@ def retrieve_from_s3(bucket: str, s3_key: str, local_file_path: str) -> None:
         raise AirflowException(f"Unexpected error: {str(e)}")
 
 
-def get_latest_file_from_s3(bucket_name: str, dag_id: str, task_id: str) -> str:
+def get_latest_file_from_s3(bucket: str, dag_id: str, task_id: str) -> str:
     """
     Retrieve the latest file from an S3 bucket using a prefix that is constructed 
     based on the DAG ID and Task ID. This function helps to ensure that each task 
     within a DAG retrieves its own respective files without any overlap.
 
     Args:
-        bucket_name (str): The name of the S3 bucket to search.
+        bucket (str): The name of the S3 bucket to search.
         dag_id (str): The ID of the DAG running the task.
         task_id (str): The ID of the task within the DAG.
 
