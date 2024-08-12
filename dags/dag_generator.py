@@ -240,7 +240,7 @@ def task_wrapper(task_function: Callable, **kwargs) -> None:
             logger.info('No latest file found in S3 bucket, skipping the comparison check.')
             latest_file_comparison_check = False
         
-        if latest_file_comparison_check:
+        if latest_file_comparison_check is True:
             logger.info('Carrying out latest file comparison check')
             latest_local_file_path = f"{STAGING_DATA}/{latest_s3_key.split('/')[-1]}"
             retrieve_from_s3(bucket=S3_STAGING_BUCKET, s3_key=latest_s3_key, local_file_path=latest_local_file_path)
