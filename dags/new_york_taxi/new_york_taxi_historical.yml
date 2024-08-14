@@ -1,7 +1,7 @@
 new_york_taxi:
   owner: Abdulkadir
   description: Getting new york taxi data
-  schedule_interval: '0 9 * * *'
+  schedule_interval: 'None'
   start_date: 2009-01-01
   url: https://d37ci6vzurychx.cloudfront.net/trip-data/{taxi_type}_tripdata_{year}-{month}.parquet
   
@@ -15,30 +15,35 @@ new_york_taxi:
   
   tasks:
     extract_yellow: &extract
-      python_callable: extract
+      python_callable: extract_historical
       file_extension: parquet
       params:
         taxi_type: yellow
+        start_date: 2023-01-01
+        end_date: 2023-12-01
 
     extract_green:
       <<: *extract
       params:
         taxi_type: green
+        start_date: 2023-01-01
+        end_date: 2023-12-01
+        
         
 
     transform_yellow: &transform
       python_callable: transform
       params:
         taxi_type: yellow
-        historical: False
-      dependencies/:
+        historical: True
+      dependencies:
         - extract_yellow
 
     transform_green:
       << : *transform
       params:
         taxi_type: green
-        historical: False
+        historical: True
       dependencies:
         - extract_green
         

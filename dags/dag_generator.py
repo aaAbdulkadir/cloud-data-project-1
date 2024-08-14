@@ -119,11 +119,21 @@ def check_two_dataframes(df_1: pl.DataFrame, df_2: pl.DataFrame) -> bool:
     Returns:
         bool: True if the dataframes are different, False if they are the same.
     """
-    cols_sorted = sorted(df_1.columns)
-    df_1 = df_1.select(cols_sorted).sort(cols_sorted)
-    df_2 = df_2.select(cols_sorted).sort(cols_sorted)
+
+    if sorted(df_1.columns) != sorted(df_2.columns):
+        raise AirflowException(
+            f'Difference in columns detected: '
+            f'Columns in df_1: {sorted(df_1.columns)}, '
+            f'Columns in df_2: {sorted(df_2.columns)}'
+        )
+
+    cols_sorted_1 = sorted(df_1.columns)
+    cols_sorted_2 = sorted(df_2.columns)
     
-    if df_1.equals(df_2):
+    df_1 = df_1.select(cols_sorted_1).sort(cols_sorted_1)
+    df_2 = df_2.select(cols_sorted_2).sort(cols_sorted_2)
+    
+    if df_1.frame_equal(df_2):
         raise AirflowSkipException(
             'Extracted file is the same as the previously extracted file, skipping.'
         )

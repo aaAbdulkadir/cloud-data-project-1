@@ -1,17 +1,19 @@
 import requests
+import pendulum
 from airflow.exceptions import AirflowException, AirflowSkipException
 import polars as pl
 
-def formulate_url(url: str, taxi_type: str, logical_timestamp: str) -> str:
-    """_summary_
+
+def formulate_url(url: str, taxi_type: str, logical_timestamp: pendulum.DateTime) -> str:
+    """Formulates a URL by substituting placeholders with taxi type, year, and month.
 
     Args:
-        url (str): _description_
-        taxi_type (str): _description_
-        logical_timestamp (str): _description_
+        url (str): URL template with placeholders for taxi type, year, and month.
+        taxi_type (str): The type of taxi data (e.g., yellow, green).
+        logical_timestamp (pendulum.DateTime): Timestamp used to determine the year and month.
 
     Returns:
-        str: _description_
+        str: The formatted URL with the taxi type, year, and month.
     """
     year = logical_timestamp.year
     month = logical_timestamp.month
@@ -21,13 +23,17 @@ def formulate_url(url: str, taxi_type: str, logical_timestamp: str) -> str:
     
 
 def get_response_data(url: str) -> dict:
-    """Get the response data from the specified URL.
+    """Fetches data from the specified URL and returns it.
 
     Args:
         url (str): The URL from which to fetch the data.
 
     Returns:
         dict: The response data as a dictionary.
+
+    Raises:
+        AirflowSkipException: If the status code is 403, indicating data might not be available yet.
+        AirflowException: For any other status codes indicating a failure to fetch data.
     """
     response = requests.get(url)
     
@@ -35,7 +41,7 @@ def get_response_data(url: str) -> dict:
         return response.content
     elif response.status_code == 403:
         raise AirflowSkipException(
-            f"Failed to fetch data from {url}. Status code: {response.status_code}"
+            f"Failed to fetch data from {url}. Status code: {response.status_code}. "
             "URL may not be available yet, skipping."
         )
     else:
@@ -45,14 +51,14 @@ def get_response_data(url: str) -> dict:
     
     
 def join_taxi_zone_data(df: pl.DataFrame, taxi_zone_lookup_df: pl.DataFrame) -> pl.DataFrame:
-    """_summary_
+    """Joins taxi data with the taxi zone lookup dataframe on location IDs.
 
     Args:
-        df (pl.DataFrame): _description_
-        taxi_zone_lookup_df (pl.DataFrame): _description_
+        df (pl.DataFrame): The main taxi data dataframe.
+        taxi_zone_lookup_df (pl.DataFrame): The dataframe containing taxi zone lookup data.
 
     Returns:
-        pl.DataFrame: _description_
+        pl.DataFrame: The resulting dataframe with taxi zone data joined.
     """
     pickup_dropoff_col_numbers = None
     if len(df['pickup_location_id'].unique()) > len(df['dropoff_location_id'].unique()):
