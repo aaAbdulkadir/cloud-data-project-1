@@ -17,11 +17,7 @@ for root, dirs, files in os.walk(dags_folder):
             
             try:
                 dag = create_dag(yml_file_path)
-                if dag:
-                    globals()[dag_id] = dag
-                    logger.info(f"Successfully loaded DAG: {dag_id}")
-                else:
-                    logger.warning(f"DAG creation returned None for {dag_id}")
+                globals()[dag_id] = dag
             except Exception as e:
                 logger.error(f"Error loading DAG {dag_id}: {str(e)}")
             

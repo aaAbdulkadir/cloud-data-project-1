@@ -1,7 +1,7 @@
 new_york_taxi_historical:
   owner: Abdulkadir
   description: Getting new york taxi data
-  schedule_interval: 'None'
+  schedule_interval: None
   start_date: 2009-01-01
   url: https://d37ci6vzurychx.cloudfront.net/trip-data/{taxi_type}_tripdata_{year}-{month}.parquet
   
