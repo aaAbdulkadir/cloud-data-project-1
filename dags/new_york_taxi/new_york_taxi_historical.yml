@@ -19,15 +19,15 @@ new_york_taxi_historical:
       file_extension: parquet
       params:
         taxi_type: yellow
-        start_date: 2023-01-01
-        end_date: 2023-12-01
+        start_date: '2023-01-01'
+        end_date: '2023-12-01'
 
     extract_green:
       <<: *extract
       params:
         taxi_type: green
-        start_date: 2023-01-01
-        end_date: 2023-12-01
+        start_date: '2023-01-01'
+        end_date: '2023-12-01'
         
         
 
