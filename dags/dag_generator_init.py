@@ -1,8 +1,10 @@
 import os 
-import logger
+import logging
 
 from dag_generator import create_dag
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 dags_folder = '/home/ubuntu/airflow/dags'
 
