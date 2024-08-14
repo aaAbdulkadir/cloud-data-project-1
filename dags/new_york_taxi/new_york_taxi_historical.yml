@@ -1,4 +1,4 @@
-new_york_taxi:
+new_york_taxi_historical:
   owner: Abdulkadir
   description: Getting new york taxi data
   schedule_interval: 'None'
