@@ -316,12 +316,16 @@ def create_dag(yml_file_path: str) -> DAG:
         'email_on_retry': dag_params.get('email_on_retry', False),
         'email': [dag_params.get('email')],
     }
-
+    
+    scheduled_interval = dag_params.get('schedule_interval')
+    if scheduled_interval == 'None':
+        scheduled_interval = None
+        
     dag = DAG(
         dag_id,
         default_args=default_args,
         description=dag_params.get('description', ''),
-        schedule_interval=dag_params.get('schedule_interval'),
+        schedule_interval=scheduled_interval,
         start_date=pendulum.parse(str(dag_params.get('start_date', pendulum.now('UTC')))),
         catchup=dag_params.get('catchup', False),
     )
