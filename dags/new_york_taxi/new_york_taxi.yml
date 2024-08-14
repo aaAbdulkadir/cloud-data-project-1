@@ -31,7 +31,7 @@ new_york_taxi:
       params:
         taxi_type: yellow
         historical: False
-      dependencies/:
+      dependencies:
         - extract_yellow
 
     transform_green:
