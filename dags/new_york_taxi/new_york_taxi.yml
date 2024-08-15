@@ -3,6 +3,7 @@ new_york_taxi:
   description: Getting new york taxi data
   schedule_interval: '0 9 * * *'
   start_date: 2009-01-01
+  catchup: True
   url: https://d37ci6vzurychx.cloudfront.net/trip-data/{taxi_type}_tripdata_{year}-{month}.parquet
   
   email_on_failure: True

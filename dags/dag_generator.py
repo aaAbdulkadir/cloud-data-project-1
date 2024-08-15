@@ -133,7 +133,7 @@ def check_two_dataframes(df_1: pl.DataFrame, df_2: pl.DataFrame) -> bool:
     df_1 = df_1.select(cols_sorted_1).sort(cols_sorted_1)
     df_2 = df_2.select(cols_sorted_2).sort(cols_sorted_2)
     
-    if df_1.frame_equal(df_2):
+    if df_1.equals(df_2):
         raise AirflowSkipException(
             'Extracted file is the same as the previously extracted file, skipping.'
         )
