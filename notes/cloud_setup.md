@@ -455,6 +455,7 @@ pip install apache-airflow-providers-amazon
 ```
 
 
+
 # Setting up CI/CD
 
 
@@ -499,7 +500,13 @@ In this example, the pipeline created can be found under `.github/workflows/depl
 At this point in the project, if code is pushed to the repo, the changes will be reflected on airflow, where the dags will update on the local airflow server and the packages will also be updated if there is a change. The infrastructure has been done and what is left is the set up of the dags.
 
 
+## Variables on Airflow
 
+The following variables needed to be added to airflwo, via the UI under the variables tab, to ensure the codebase and pipeline works as intended.
+
+- S3 staging bucket path so that the variable can be used in the python code when trying to ingest and retrieve from the bucket
+
+- RDS credentials so that the staging data can be loaded into the database using boto3.
 
 
 
