@@ -107,6 +107,10 @@
             "4": "Nassau or Westchester",
             "5": "Negotiated fare",
             "6": "Group ride"
+        },
+        "vendor_id": {
+            "1": "Creative Mobile Technologies",
+            "2": "VeriFone Inc."
         }
 
     }

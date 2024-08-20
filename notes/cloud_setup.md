@@ -2,516 +2,421 @@
 
 **Note**: Everything is being done with the free tier of AWS.
 
-
 ## Setting up IAM
 
 To follow best practices, the first step is to configure an IAM user group and user with the minimum necessary permissions to run this project. The IAM user group will have permissions to read and write to S3 buckets, interact with the EC2 instance, and access the RDS database. The following steps will be performed under the root user.
 
+### Permissions needed for this project
 
-**Permissions needed for this project**:
-
-- Read write S3
-
+- Read and write S3
 - Permissions to EC2
-
 - Permissions to RDS
 
+### Create a user
 
-**Create a user**:
+1. Go to **IAM > Users > Create User**
+2. Create a name for the user, e.g., `data-pipeline`
+3. Attach this user to a group for best practices, as outlined by AWS, especially when replicating an instance where there are multiple users in a group
+4. Create the user
 
-- IAM > Users > Create User 
+### Create a user group
 
--  Create a name for the user, in this case the name will be  `data-pipeline`
+1. Go to **IAM > User groups > Create group**
+2. Create a name for the group, e.g., `data-pipeline-group`
+3. Add the user created to this group
+4. Create the user group
 
-- We will attach this user to a group for best practices, as outlined by AWS, or replicating an instance where there are mulitple users in a group
+### Create a policy
 
-- Create user
+1. Go to **IAM > Policies > Create a policy**
+2. Add the following permissions to the IAM policy:
 
+    ```json
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "S3Access",
+                "Effect": "Allow",
+                "Action": [
+                    "s3:GetObject",
+                    "s3:PutObject",
+                    "s3:ListBucket"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::your-bucket-name",
+                    "arn:aws:s3:::your-bucket-name/*"
+                ]
+            },
+            {
+                "Sid": "RDSAccess",
+                "Effect": "Allow",
+                "Action": [
+                    "rds:DescribeDBInstances",
+                    "rds:DescribeDBClusters",
+                    "rds:ModifyDBInstance",
+                    "rds:ModifyDBCluster",
+                    "rds-data:ExecuteStatement",
+                    "rds-data:BatchExecuteStatement"
+                ],
+                "Resource": "arn:aws:rds:*:*:db:your-db-instance-identifier"
+            }
+        ]
+    }
+    ```
 
-**Create a user group**:
+3. To ensure the IAM group only has access to the DAG and staging data S3 buckets and the RDS database, specify the `Resource` in the IAM JSON template. Since these resources haven’t been created yet, replace with `"Resource": "*"` temporarily. Once created, modify to point to the correct location.
+4. Add a policy name, e.g., `data-pipeline-policy`.
+5. Create the policy.
 
-- IAM > User groups > Create group
+### Attach policy to group
 
-- Create a name for the group, in this case the name will be `data-pipeline-group`
-
-- Add the user created to this group 
-
-- Create user group
-
-**Create a policy**:
-
-- Create a policy which has the necessary permissions needed
-
-- IAM > Policies > Create a policy
-
-- Add the following permissions to the IAM policy:
-```json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "S3Access",
-            "Effect": "Allow",
-            "Action": [
-                "s3:GetObject",
-                "s3:PutObject",
-                "s3:ListBucket"
-            ],
-            "Resource": [
-                "arn:aws:s3:::your-bucket-name",
-                "arn:aws:s3:::your-bucket-name/*"
-            ]
-        },
-        {
-            "Sid": "RDSAccess",
-            "Effect": "Allow",
-            "Action": [
-                "rds:DescribeDBInstances",
-                "rds:DescribeDBClusters",
-                "rds:ModifyDBInstance",
-                "rds:ModifyDBCluster",
-                "rds-data:ExecuteStatement",
-                "rds-data:BatchExecuteStatement"
-            ],
-            "Resource": "arn:aws:rds:*:*:db:your-db-instance-identifier"
-        }
-    ]
-}
-
-```
-
-- We want the IAM group to only have access to the dag and staging data s3 buckets and the RDS database, nothing else. to ensure that, the resource has to be stated in the IAM json template. As for now, those have not been created so it can be replaced with `"Resource": "*"` and once created, this can be modified to point to the right location.
-
-
-- Add policty name, in this case the name will be `data-pipeline-policy`
-
-- Create policy
-
-
-**Attach policy to group**:
-
-- Go to the `data-pipeline-group` created and select the permissions tab
-
-- Add permissions
-
-- Search for `data-pipeline-policy`
-
-- Attach policies
-
+1. Go to the **data-pipeline-group** created and select the **Permissions** tab
+2. Click **Add permissions**
+3. Search for `data-pipeline-policy`
+4. Attach the policy
 
 ## Setting up S3 Bucket
 
-Two S3 buckets will be created, one for the staging data and one for the dags. When following the steps, make sure you are in the location you want to be in. For this project, `eu-west-2` will be used.
+Two S3 buckets will be created, one for staging data and one for DAGs. When following the steps, ensure you are in the correct region. For this project, `eu-west-2` will be used
 
-- S3 > Buckets > Create bucket > General purpose 
+1. Go to **S3 > Buckets > Create bucket > General purpose**
+2. Add a bucket name, e.g., `data-pipeline-airflow-dags-2`
+3. Create the bucket
 
-- Add bucket name, in this case the bucket name will be `data-pipeline-airflow-dags-2`
-
-- Create bucket
-
-Likewise, one for staging data can be created using the bucket name `data-pipeline-staging-data-2`
-
+Repeat the above steps to create a bucket for staging data with the name `data-pipeline-staging-data-2`.
 
 ## Setting up RDS
 
-###  Initial setup
+### Initial setup
 
-The RDS will be used to store the final datasets.
+The RDS will be used to store the final datasets
 
-- RDS > Create database 
-
-- Select the PostgreSQL database
-
-- Select the free tier template
-
-- Add a database name, in this case the name will be `data-pipeline-database`
-
-- Add a master username and password
-
-- Select `db.t3.micro` for the instance configuration
-
-- Select `General Purpose SSD (gp2)` for storage 
-
-- Disable storage autoscaling
-
-- Select `Default VPC` for connectivity and `default` subnet group 
-
-- Allow public acces to the RDS
-
-- Under additional configuration, create an initial database name. In this case, it will be `data_pipeline_db`
-
-- Create database
+1. Go to **RDS > Create database**
+2. Select the **PostgreSQL** database
+3. Select the **Free tier** template
+4. Add a database name, e.g., `data-pipeline-database`
+5. Add a master username and password
+6. Select `db.t3.micro` for the instance configuration
+7. Select **General Purpose SSD (gp2)** for storage
+8. Disable storage autoscaling
+9. Select **Default VPC** for connectivity and **default** subnet group
+10. Allow public access to the RDS
+11. Under additional configuration, create an initial database name, e.g., `data_pipeline_db`
+12. Create the database
 
 ### Setting up connectivity
 
-- Click on the database that has been created
-
-- Click on the link under Security > VPC security groups
-
-- Go to inbound rules
-
-- Click on Edit inbound rules
-
-- Add rule 
-    - Allow Custom TCP, port 8080, IPv4
-
-- Save rules
-
+1. Click on the database created
+2. Click on the link under **Security > VPC security groups**
+3. Go to **Inbound rules**
+4. Click on **Edit inbound rules**
+5. Add a rule:
+    - Allow **Custom TCP**, port `8080`, `IPv4`
+6. Save the rules
 
 ## Setting up EC2
 
-###  Initial setup
+### Initial setup
 
-The EC2 instance will be used as a server for Airflow
+The EC2 instance will be used as a server for Airflow.
 
-- EC2 > Launch Instance
-
-- Add a server name, in this case the EC2 name will be `airflow-server`
-
-- Click on `Ubuntu` for the OS image
-
-- Leave the AMI as free tier image
-
-- Select `t2.small` for the instance type, to ensure enough memory to run Airflow
-
-- Create new key-pair login, in this case the name used will be `data-pipeline-key-pair` for the RSA OpenSSH key pair.
-
-- Under network settings, select the check boxes
-    - Allow HTTPS traffic from the internet
-    - Allow HTTP traffic from the internet
-
-- Launch instance
+1. Go to **EC2 > Launch Instance**
+2. Add a server name, e.g., `airflow-server`
+3. Click on **Ubuntu** for the OS image
+4. Leave the AMI as the free tier image
+5. Select `t2.small` for the instance type to ensure enough memory to run Airflow
+6. Create a new key-pair login, e.g., `data-pipeline-key-pair` for the RSA OpenSSH key pair
+7. Under network settings, select the checkboxes:
+    - Allow **HTTPS traffic** from the internet
+    - Allow **HTTP traffic** from the internet
+8. Launch the instance
 
 ### Setting up connectivity
 
-- Instances > Security
-
-- Click on the security groups link
-
-- Click Edit inbound rules
-
-- Add rule 
-    - Allow Custom TCP, port 8080, My IP
-
-- Save rules
+1. Go to **Instances > Security**
+2. Click on the security groups link
+3. Click **Edit inbound rules**
+4. Add a rule:
+    - Allow **Custom TCP**, port `8080`, **My IP**
+5. Save the rules
 
 ### Adding Elastic IP
 
-An elastic ip stays static and will not change which is useful.
+An elastic IP stays static and will not change, which is useful.
 
-On the EC2 dashboard:
+1. On the EC2 dashboard, go to **Elastic IPs > Allocate Elastic IP address > Allocate**
+2. Click on the airflow instance to associate it with the elastic IP
 
-- Elastic IPs > Allocate Elastic IP address > Allocate
+## Downloading AWS CLI
 
-Then click on the airflow instance to assoociate it with the elastic ip.
+The AWS CLI will be used frequently when accessing AWS services via the command line. It can be downloaded by following the instructions on the AWS website or by running the following command:
 
-
-# Downloading AWS CLI
-
-The AWS CLI will be used frequently when accessing AWS services via the command line, It can be downloaded by following the instructions on the AWS website or by running the following command:
-
-```linux
+```bash
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-
 unzip awscliv2.zip
-
 sudo ./aws/install
+
 ```
 
 # Setting up Airflow
 
 ## Connecting to the EC2
 
-- Check the ec2 instance created and click connect
+1. Check the EC2 instance created and click connect
 
-- Using the downloaded key pair and the instructions given by AWS, connect to the ec2 instance. The SSH command will look similar to below:
+2. Using the downloaded key pair and the instructions given by AWS, connect to the EC2 instance. The SSH command will look similar to the one below:
 
-```linux
-ssh -i "data-pipeline-key-pair.pem" ubuntu@{public dns}
-```
-After running the command using the key pair pem, the connection should be successful.
+    ```bash
+    ssh -i "data-pipeline-key-pair.pem" ubuntu@{public_dns}
+    ```
+    After running the command using the key pair PEM file, the connection should be successful
 
 ## Downloading Airflow on the EC2
 
+1. The first thing to do on the new EC2 instance is to run an update to install the latest packages:
 
-The first thing to do in the new EC2 instance is to run an update to install the latest packages
+    ```bash
+    # Update the package list
+    sudo apt-get update
 
-```python
-# Update the package list
-sudo apt-get update
+    # Install Python, pip, and other necessary packages
+    sudo apt-get install -y python3 python3-pip python3-dev libmysqlclient-dev build-essential
+    ```
 
-# Install Python, pip, and other necessary packages
-sudo apt-get install -y python3 python3-pip python3-dev libmysqlclient-dev build-essential
-```
+2. Next, create a virtual environment which will allow for the setup of the virtual environment:
 
-Next, a virtual environment will need to be created which will allow for the set up of the virtual env.
+    ```bash
+    sudo apt install python3.12-venv
+    python3 -m venv venv
+    ```
 
-```
-sudo  apt install python3.12-venv
+3. Access the virtual Python environment with the following command:
 
-python3 -m venv venv
-```
+    ```bash
+    source venv/bin/activate
+    ```
 
-The virtual python environment can be accessed with the following command
+4. It's useful to upgrade `pip` in the virtual environment:
 
-```
-source venv/bin/activate
-```
+    ```bash
+    pip install --upgrade pip setuptools wheel
+    ```
 
-It is useful to upgrade pip in the virtual environment
+5. Now, you can download Airflow:
 
-```
-pip install --upgrade pip setuptools wheel
-```
+    ```bash
+    pip install apache-airflow
+    ```
 
-Now, airflow can be downloaded
+6. After downloading Airflow, you can run it as follows:
 
-```
-pip install apache-airflow
-```
+    - **Initialize the Database**:
 
-After downloading airflow, airflow can be run as follows
+        ```bash
+        airflow db init
+        ```
 
-- Initialise the DB
+    - **Create an Airflow user**:
 
-```
-airflow db init
-```
+        ```bash
+        airflow users create \
+            --username admin \
+            --password admin \
+            --firstname First \
+            --lastname Last \
+            --role Admin \
+            --email admin@example.com
+        ```
 
-- Create an airflow user
+    - **Start the Airflow webserver**:
 
-```
-airflow users create \
-    --username admin \
-    --password admin \
-    --firstname First \
-    --lastname Last \
-    --role Admin \
-    --email admin@example.com
-```
+        ```bash
+        airflow webserver -p 8080 -D
+        ```
 
-- Start the Airflow webserver
+    - **Start the Airflow scheduler**:
 
-```
-airflow webserver -p 8080 -D
-```
+        ```bash
+        airflow scheduler -D
+        ```
 
-- Start the Airflow scheduler
+7. To check if Airflow is running via the CLI, you can run the following command and look at the status:
 
-```
-airflow scheduler -D
-```
+    ```bash
+    ps aux | grep airflow
+    ```
 
-To see if airflow is running via the cli, you can run the following command and look at the status
+8. Now that Airflow is up and running, the webserver UI can be accessed by going to the EC2 URL and opening it with the extension `:8080`, e.g., `http://your_ec2_public_ip:8080`. Another way to access the website is with the Elastic IP created, where the URL will be `http://your_elastic_ip:8080`
 
-```
-ps aux | grep airflow
-```
+    ![main](image.png)
 
-Now that airflow is up and running, the webserver UI can be accessed by going onto the EC2 url and opening it with the extension `:8080`, e.g. `http://your_ec2_public_ip:8080`. The website should look like this. Another way to access the website is with the elastic ip created, where the url will be `http://your_elastic_ip:8080`
+9. Once you have logged in with your credentials, you can access Airflow
 
-![alt text](image.png)
+10. To remove all the example DAGs that Airflow offers by default, go to the Airflow config file and set `load_examples = False`:
 
-Once you have logged in with your credentials, you can access airflow.
+    ```bash
+    nano ~/airflow/airflow.cfg
+    ```
 
-To remove all the example dags that airflow offers by default, go to the airflow config file and set `load_examples = False`
+11. After setting this, source the command:
 
-```
-nano ~/airflow/airflow.cfg
-```
+    ```bash
+    source ~/airflow/airflow.cfg
+    ```
 
-Set the command and
+12. After this, the Airflow services need to be restarted:
 
-```
-source ~/airflow/airflow.cfg
-```
+    ```bash
+    # Restart the webserver
+    pkill -f "airflow webserver"
+    pkill -f "airflow scheduler"
 
-After this, airflow services needs to be restarted
+    # Restart the webserver and scheduler
+    airflow webserver -p 8080 -D
+    airflow scheduler -D
+    ```
 
-```python
-# Restart the webserver
-pkill -f "airflow webserver"
-pkill -f "airflow scheduler"
+13. Finally, to ensure Airflow starts up when the EC2 is turned on, run the following:
 
-# Restart the webserver and scheduler
-airflow webserver -p 8080 -D
-airflow scheduler -D
-```
+    ```bash
+    # Create a systemd service file for the Airflow webserver
+    sudo nano /etc/systemd/system/airflow-webserver.service
+    ```
 
-Finally, to ensure airflow starts up when the ec2 is turned on, run the following
+    Add this to the file:
 
-```
-sudo nano /etc/systemd/system/airflow-webserver.service
-```
+    ```ini
+    [Unit]
+    Description=Airflow webserver daemon
+    After=network.target
 
-Add this to the file
+    [Service]
+    User=ubuntu
+    Group=ubuntu
+    Environment="PATH=/home/ubuntu/venv/bin"
+    ExecStart=/home/ubuntu/venv/bin/airflow webserver --pid /home/ubuntu/airflow/airflow-webserver.pid
+    Restart=always
+    RestartSec=5s
 
-```python
-[Unit]
-Description=Airflow webserver daemon
-After=network.target
+    [Install]
+    WantedBy=multi-user.target
+    ```
 
-[Service]
-User=ubuntu
-Group=ubuntu
-Environment="PATH=/home/ubuntu/venv/bin"
-ExecStart=/home/ubuntu/venv/bin/airflow webserver --pid /home/ubuntu/airflow/airflow-webserver.pid
-Restart=always
-RestartSec=5s
+    Similarly:
 
-[Install]
-WantedBy=multi-user.target
+    ```bash
+    # Create a systemd service file for the Airflow scheduler
+    sudo nano /etc/systemd/system/airflow-scheduler.service
+    ```
 
-```
+    Add this to the file:
 
-Similarly,
+    ```ini
+    [Unit]
+    Description=Airflow scheduler daemon
+    After=network.target
 
+    [Service]
+    User=ubuntu
+    Group=ubuntu
+    Environment="PATH=/home/ubuntu/venv/bin"
+    ExecStart=/home/ubuntu/venv/bin/airflow scheduler --pid /home/ubuntu/airflow/airflow-scheduler.pid
+    Restart=always
+    RestartSec=5s
 
-```
-sudo nano /etc/systemd/system/airflow-scheduler.service
-```
+    [Install]
+    WantedBy=multi-user.target
+    ```
 
-```python
-[Unit]
-Description=Airflow scheduler daemon
-After=network.target
+14. When booting up, run:
 
-[Service]
-User=ubuntu
-Group=ubuntu
-Environment="PATH=/home/ubuntu/venv/bin"
-ExecStart=/home/ubuntu/venv/bin/airflow scheduler --pid /home/ubuntu/airflow/airflow-scheduler.pid
-Restart=always
-RestartSec=5s
+    ```bash
+    # Enable services
+    sudo systemctl enable airflow-webserver
+    sudo systemctl enable airflow-scheduler
 
-[Install]
-WantedBy=multi-user.target
-```
+    # Start services
+    sudo systemctl start airflow-webserver
+    sudo systemctl start airflow-scheduler
+    ```
 
+15. Verify the services are running:
 
+    ```bash
+    sudo systemctl status airflow-webserver
+    sudo systemctl status airflow-scheduler
+    ```
 
-
-
-When booting up run
-
-```python
-# Enable services
-sudo systemctl enable airflow-webserver
-sudo systemctl enable airflow-scheduler
-
-# Start services
-sudo systemctl start airflow-webserver
-sudo systemctl start airflow-scheduler
-```
-
-Verify the services are running 
-
-```
-sudo systemctl status airflow-webserver
-sudo systemctl status airflow-scheduler
-```
-
-### Trigger DAG w/config
-
-- To ensure this variable is available when trying to run dags with a config or at a different timestamp, ensure 
-`show_trigger_form_if_no_params = False` is set to `True` in the airflow.cfg file.
-
-
+16. To ensure this variable is available when trying to run DAGs with a config or at a different timestamp, ensure `show_trigger_form_if_no_params = False` is set to `True` in the airflow.cfg file
 
 ## Downloading AWS CLI on EC2
 
-Run the commands found in the `Downloading AWS CLI` section
-
+1. Run the commands found in the `Downloading AWS CLI` section.
 
 ## Set up IAM Credentials on EC2
 
+1. Now the AWS credentials need to be set up to allow the EC2 instance to interact with the other AWS services like the S3 bucket and RDS
 
-Now the AWS credentials need to be set up to allow the ec2 instance to interact with the other aws services like the s3 bucket and rds.
+2. Go to **IAM > Users**
 
-- IAM > Users
+3. Create an access key and save the access key details
 
-- Create access key
+4. In the bashrc file of the EC2 instance, export the access key variables and source them:
 
-- Save access key details
+    ```bash
+    export AWS_ACCESS_KEY_ID='your_access_key'
+    export AWS_SECRET_ACCESS_KEY='your_secret_key'
+    ```
 
+5. Once downloaded, configure AWS with your access key and secret key on the EC2 by typing:
 
-In the bashrc file of the EC2 instance, export the access key variables and source them.
+    ```bash
+    aws configure
+    ```
 
-```
-export AWS_ACCESS_KEY_ID='your_access_key'
-export AWS_SECRET_ACCESS_KEY='your_secret_key'
-```
+6. After, ensure the following Airflow AWS package is installed to interact with AWS services:
 
-Once downloaded, configure aws with your access key and secret key on the ec2 by typing 
-
-```
-aws configure
-```
-
-After, ensure the following airflow aws package is installed to interact with AWS services
-
-```
-pip install apache-airflow-providers-amazon
-```
-
-
+    ```bash
+    pip install apache-airflow-providers-amazon
+    ```
 
 # Setting up CI/CD
 
+## GitHub Actions Pipeline
 
-GitHub actions pipeline needs to:
+1. The GitHub actions pipeline needs to:
 
-- Push new dag and requirements changes to the dags s3 bucket
+    - Push new DAG and requirements changes to the DAGs S3 bucket
+    - Connect to the EC2 instance
+    - Sync S3 bucket changes to the EC2 Airflow
 
-- Connect to the EC2 instance 
+2. Set up:
 
-- Sync s3 bucket changes to the EC2 airflow
+    - Go to the GitHub repo with your DAGs and other files and click on the settings button
+    - Navigate to **Secrets and variables > Actions > New repository secret**
 
+3. Add the following variables in secrets to ensure the pipeline can run the AWS services as intended:
 
-## Set up
+    - `AWS_ACCESS_KEY_ID`: Your AWS access key ID
+    - `AWS_SECRET_ACCESS_KEY`: Your AWS secret access key
+    - `AWS_REGION`: The AWS region where your S3 bucket is located
+    - `S3_BUCKET`: The name of your S3 bucket
+    - `EC2_INSTANCE`: The public DNS or IP address of your EC2 instance (better yet, use the Elastic IP address so it does not change. If set up, it will do it automatically)
+    - `SSH_PRIVATE_KEY`: Your EC2 instance's SSH private key
+    - `EC2_USER`: The username for SSH access to your EC2 instance
 
-- Go to the GitHub repo with your dags and other files and click on the settings button
+4. After adding the keys, create a GitHub Actions workflow:
 
-- Secrets and variables > Actions > New repository secret
+    - Create a new workflow file in the repository at `.github/workflows/deploy-dags.yml`
 
-- Add the following variables in secrets to ensure the pipeline can run the aws services as intended
+5. In this example, the pipeline created can be found under `.github/workflows/deploy-dags.yml`. As soon as the YAML file is written and the code is pushed, it will be initiated
 
-    - AWS_ACCESS_KEY_ID: Your AWS access key ID.
-
-    - AWS_SECRET_ACCESS_KEY: Your AWS secret access key.
-
-    - AWS_REGION: The AWS region where your S3 bucket is located.
-
-    - S3_BUCKET: The name of your S3 bucket.
-
-    - EC2_INSTANCE: The public DNS or IP address of your EC2 instance (better yet use the elastic ip address so it does not change. If set up, it will do it automatically)
-
-    - SSH_PRIVATE_KEY: Your EC2 instance's SSH private key.
-
-    - EC2_USER: The username for SSH access to your EC2 instance.
-
-
-After adding the keys, create a GitHub actions workflow
-
-- Create a new workflow file in the repository at `.github/workflows/deploy-dags.yml`
-
-In this example, the pipeline created can be found under `.github/workflows/deploy-dags.yml`. As soon as the yaml file is written and the code is pushed, it will be initiated.
-
-At this point in the project, if code is pushed to the repo, the changes will be reflected on airflow, where the dags will update on the local airflow server and the packages will also be updated if there is a change. The infrastructure has been done and what is left is the set up of the dags.
-
+6. At this point in the project, if code is pushed to the repo, the changes will be reflected on Airflow, where the DAGs will update on the local Airflow server and the packages will also be updated if there is a change. The infrastructure has been done and what is left is the setup of the DAGs
 
 ## Variables on Airflow
 
-The following variables needed to be added to airflwo, via the UI under the variables tab, to ensure the codebase and pipeline works as intended.
+1. The following variables need to be added to Airflow via the UI under the variables tab to ensure the codebase and pipeline work as intended:
 
-- S3 staging bucket path so that the variable can be used in the python code when trying to ingest and retrieve from the bucket
-
-- RDS credentials so that the staging data can be loaded into the database using boto3.
-
-
-
-# Improvements
-
-- improvement: set up VPC
-
-IS S3 USED TO STORE DAGS FOR VERSIONING? DO WE SYNC OUR BUCKET TO OUR AIRFLOW DAGS FOLDER? IT IS FASTER YES BUT WHAT ABOUT SCALABILITY? IS THAT WHAT THE EBS IS USED FOR? ENABLE BUCKET VERSIONING FOR s3 for dags?
+    - S3 staging bucket path so that the variable can be used in the Python code when trying to ingest and retrieve from the bucket
+    - RDS credentials so that the staging data can be loaded into the database using `boto3`

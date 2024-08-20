@@ -6,3 +6,4 @@ boto3
 mock
 pyarrow
 polars
+sqlalchemy 

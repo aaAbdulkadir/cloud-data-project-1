@@ -4,6 +4,15 @@ This project is an ETL pipeline built using Apache Airflow, designed to efficien
 
 The core of the project is a dynamic framework that allows for the easy creation of multiple scrapes (DAGs) based on a YAML configuration file. This setup streamlines the process of extracting, transforming, and loading data into the RDS. The DAGs and their dependencies are version-controlled and deployed through a CI/CD pipeline, ensuring that the S3 bucket and the Airflow instance remain in sync. This infrastructure provides a scalable solution for writing and deploying custom data scraping tasks, enabling efficient data management and processing.
 
+**Schematic of Airflow Architecture**:
+
+![main airflow architecture](notes/airflow_pipeline.png)
+
+
+The second half of this project is...
+
+**Data Warehousing Architecture**:
+
 ## Part 1: Cloud Infrastructure Set-Up
 
 In this section, we establish the foundational cloud infrastructure required to run our ETL pipeline using AWS services. The key components include:
@@ -69,23 +78,13 @@ This section details the development and configuration of the Airflow infrastruc
 
 ## Part 3: Data Warehousing
 
-In this section, we transition from managing and processing data with Airflow to data warehousing using AWS Glue. The goal is to efficiently move data from Amazon RDS to Amazon Redshift and perform data modeling for analytical purposes.
 
-### 1. **AWS Glue Setup**
 
-- **Create a Glue Data Catalog**: Define databases and tables that reflect the structure of data stored in RDS.
-- **Set Up Glue Crawlers**: Automate the discovery and cataloging of RDS data into Glue.
-- **Configure Redshift Connection**: Establish a connection between Glue and Amazon Redshift for data loading.
 
-### 2. **ETL Jobs with AWS Glue**
+# Improvements
 
-- **Define ETL Jobs**: Create Glue jobs to extract data from RDS, transform it as needed, and load it into Redshift.
-- **Transformations**: Use Glue's capabilities to clean, format, and aggregate data for optimal analysis.
-- **Job Scheduling**: Optionally schedule Glue jobs to run at regular intervals for continuous data integration.
+- Add upsert to list of load mode
 
-### 3. **Data Modeling in Redshift**
+- Scalability of airflow pipeline to handle larger datasets
 
-- **Create Fact and Dimension Tables**: Design a schema that separates transactional data (facts) from descriptive attributes (dimensions) for better query performance.
-- **Optimize Performance**: Implement distribution and sort keys, and regularly maintain the database with vacuum and analyze operations.
-
-This part of the project focuses on leveraging AWS Glue for seamless data migration and transformation, followed by data modeling in Amazon Redshift to enable advanced analytics and reporting.
+- For RDS to Redshift, use cloudwatch logs (RDS db logs) to trigger a run for the migration to occur OR trigger when new file uploaded to s3 bucket.
