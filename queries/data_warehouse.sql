@@ -1,6 +1,17 @@
+-- Drop tables if they exist
+DROP TABLE IF EXISTS taxi_trip;
+DROP TABLE IF EXISTS location;
+DROP TABLE IF EXISTS service_zone;
+DROP TABLE IF EXISTS borough;
+DROP TABLE IF EXISTS zone;
+DROP TABLE IF EXISTS payment_type;
+DROP TABLE IF EXISTS ratecode;
+DROP TABLE IF EXISTS vendor;
+DROP TABLE IF EXISTS taxi_type;
+
 -- Create the vendor table
 CREATE TABLE vendor (
-    id SERIAL PRIMARY KEY,
+    id INTEGER IDENTITY(1, 1) PRIMARY KEY,
     name VARCHAR(255) NOT NULL
 );
 
@@ -11,7 +22,7 @@ FROM new_york_taxi;
 
 -- Create the ratecode table
 CREATE TABLE ratecode (
-    id SERIAL PRIMARY KEY,
+    id INTEGER IDENTITY(1, 1) PRIMARY KEY,
     description VARCHAR(255) NOT NULL
 );
 
@@ -22,7 +33,7 @@ FROM new_york_taxi;
 
 -- Create the payment_type table
 CREATE TABLE payment_type (
-    id SERIAL PRIMARY KEY,
+    id INTEGER IDENTITY(1, 1) PRIMARY KEY,
     method VARCHAR(255) NOT NULL
 );
 
@@ -33,7 +44,7 @@ FROM new_york_taxi;
 
 -- Create the zone table
 CREATE TABLE zone (
-    id SERIAL PRIMARY KEY,
+    id INTEGER IDENTITY(1, 1) PRIMARY KEY,
     name VARCHAR(255) NOT NULL
 );
 
@@ -44,7 +55,7 @@ FROM new_york_taxi;
 
 -- Create the borough table
 CREATE TABLE borough (
-    id SERIAL PRIMARY KEY,
+    id INTEGER IDENTITY(1, 1) PRIMARY KEY,
     name VARCHAR(255) NOT NULL
 );
 
@@ -55,7 +66,7 @@ FROM new_york_taxi;
 
 -- Create the service_zone table
 CREATE TABLE service_zone (
-    id SERIAL PRIMARY KEY,
+    id INTEGER IDENTITY(1, 1) PRIMARY KEY,
     name VARCHAR(255) NOT NULL
 );
 
@@ -66,7 +77,7 @@ FROM new_york_taxi;
 
 -- Create the location table
 CREATE TABLE location (
-    id SERIAL PRIMARY KEY,
+    id INTEGER IDENTITY(1, 1) PRIMARY KEY,
     zone_id INTEGER NOT NULL,
     borough_id INTEGER NOT NULL,
     service_zone_id INTEGER NOT NULL,
@@ -86,9 +97,20 @@ JOIN zone z ON nt.zone = z.name
 JOIN borough b ON nt.borough = b.name
 JOIN service_zone s ON nt.service_zone = s.name;
 
+-- Create the taxi_type table
+CREATE TABLE taxi_type (
+    id INTEGER IDENTITY(1, 1) PRIMARY KEY,
+    type VARCHAR(255) NOT NULL
+);
+
+-- Insert into taxi_type table
+INSERT INTO taxi_type (type)
+SELECT DISTINCT taxi_type
+FROM new_york_taxi;
+
 -- Create the taxi_trip table
 CREATE TABLE taxi_trip (
-    id SERIAL PRIMARY KEY,
+    id INTEGER IDENTITY(1, 1) PRIMARY KEY,
     vendor_id INTEGER NOT NULL,
     pickup_datetime TIMESTAMP NOT NULL,
     dropoff_datetime TIMESTAMP NOT NULL,
@@ -108,11 +130,12 @@ CREATE TABLE taxi_trip (
     congestion_surcharge FLOAT,
     airport_fee FLOAT,
     location_id INTEGER NOT NULL,
-    taxi_type VARCHAR(255),
+    taxi_type_id INTEGER NOT NULL,
     FOREIGN KEY (vendor_id) REFERENCES vendor(id),
     FOREIGN KEY (ratecode_id) REFERENCES ratecode(id),
     FOREIGN KEY (payment_type_id) REFERENCES payment_type(id),
-    FOREIGN KEY (location_id) REFERENCES location(id)
+    FOREIGN KEY (location_id) REFERENCES location(id),
+    FOREIGN KEY (taxi_type_id) REFERENCES taxi_type(id)
 );
 
 -- Insert into taxi_trip table
@@ -136,7 +159,7 @@ INSERT INTO taxi_trip (
     congestion_surcharge,
     airport_fee,
     location_id,
-    taxi_type
+    taxi_type_id
 )
 SELECT
     v.id AS vendor_id,
@@ -158,11 +181,12 @@ SELECT
     nt.congestion_surcharge,
     nt.airport_fee,
     l.id AS location_id,
-    nt.taxi_type
+    tt.id AS taxi_type_id
 FROM new_york_taxi nt
 JOIN vendor v ON nt.vendor_id = v.name
 JOIN ratecode r ON nt.ratecode = r.description
 JOIN payment_type pt ON nt.payment_type = pt.method
 JOIN location l ON nt.zone = (SELECT name FROM zone WHERE id = l.zone_id)
                   AND nt.borough = (SELECT name FROM borough WHERE id = l.borough_id)
-                  AND nt.service_zone = (SELECT name FROM service_zone WHERE id = l.service_zone_id);
+                  AND nt.service_zone = (SELECT name FROM service_zone WHERE id = l.service_zone_id)
+JOIN taxi_type tt ON nt.taxi_type = tt.type;
