@@ -8,7 +8,12 @@ The core of the project is a dynamic framework that allows for the easy creation
 
 ![main airflow architecture](notes/airflow_pipeline.png)
 
-The second half of this project is...
+The second half of this project is using the scraped *New York Taxi* dataset, migrating the data stored in the RDS database to AWS Redshift using AWS Lambda, and creating a data warehouse for analytics purposes.
+
+**Schematic of Migration Architecture**:
+
+![lambda warehouse architecture](notes/lambdapipeline.png)
+
 
 ## Data Warehousing Architecture
 
@@ -78,6 +83,11 @@ In this section, we focus on setting up and managing data warehousing using Amaz
    - **Add Trigger**: Set up an S3 trigger for Lambda to activate on new `.csv` files in a specific bucket prefix.
 
 For detailed instructions on setting up Redshift and Lambda, refer to the [Data Warehousing Setup](https://github.com/aaAbdulkadir/cloud-data-project-1/blob/main/notes/datawarehouse_setup.md) notes.
+
+
+### Part 4: Images of infrastructure
+
+Refer to [Images](https://github.com/aaAbdulkadir/cloud-data-project-1/blob/main/notes/images.md)
 
 # Improvements
 

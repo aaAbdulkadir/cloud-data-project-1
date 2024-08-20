@@ -30,3 +30,11 @@
 
 
 
+**Lambda**
+
+![lambda](s3lambda.png)
+
+
+**Redshift Warehouse**
+
+![redshif tquery](redshiftquery.png)
